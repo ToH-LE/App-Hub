@@ -110,13 +110,13 @@
   <span class="nav-logo">App<span>Hub</span></span>
   <div class="nav-sep"></div>
   <button class="nav-tab active" data-panel="colour" onclick="showPanel('colour')">
-    <span class="icon">🎨</span> Colour Converter
+    Colour Converter
   </button>
   <button class="nav-tab" data-panel="lightengine" onclick="showPanel('lightengine')">
-    <span class="icon">📺</span> Test Pattern
+    Test Pattern
   </button>
   <button class="nav-tab" data-panel="slides" onclick="showPanel('slides')">
-    <span class="icon">🖼️</span> Slide Export
+    Slide Export
   </button>
 </nav>
 
@@ -1170,18 +1170,18 @@
 <meta charset=&quot;UTF-8&quot;>
 <meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;>
 <title>Slide Exporter</title>
-<link href=&quot;https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&amp;family=Syne:wght@400;600;700;800&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
+<link href=&quot;https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&amp;family=DM+Sans:wght@300;400;500;600&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
 <script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js&quot;></script>
 <script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js&quot;></script>
 <style>
   :root {
-    --bg: #0e0e10; --surface: #18181b; --surface2: #1f1f23;
-    --border: #2a2a2f; --accent: #ff3333; --text: #f4f4f5; --muted: #71717a;
+    --bg: #0a0a0a; --surface: #131313; --surface2: #1a1a1a;
+    --border: #252525; --accent: #ff3333; --text: #f0f0f0; --muted: #555;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: 'DM Mono', monospace;
+    font-family: 'JetBrains Mono', monospace;
     background: var(--bg); color: var(--text);
     height: 100vh; overflow: hidden;
     display: grid;
@@ -1190,15 +1190,15 @@
   }
 
   header {
-    grid-column: 1/-1; background: var(--surface);
+    grid-column: 1/-1; background: #000;
     border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; padding: 0 20px; gap: 10px;
+    display: flex; align-items: center; padding: 0 16px; gap: 10px;
   }
-  header h1 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.5px; }
+  header h1 { font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.5px; }
   header h1 span { color: var(--accent); }
   .badge {
-    font-size: 10px; background: var(--accent); color: #000;
-    padding: 2px 8px; border-radius: 99px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase;
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; background: var(--accent); color: #fff;
+    padding: 3px 9px; border-radius: 99px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
   }
   #size-badge { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
 
@@ -1212,14 +1212,14 @@
 
   .section { padding: 14px 16px; border-bottom: 1px solid var(--border); }
   .section-title {
-    font-size: 10px; text-transform: uppercase; letter-spacing: 1px;
+    font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;
     color: var(--muted); margin-bottom: 10px;
     display: flex; align-items: center; justify-content: space-between;
   }
 
   textarea {
     width: 100%; background: var(--bg); border: 1px solid var(--border);
-    border-radius: 8px; color: var(--text); font-family: 'DM Mono', monospace;
+    border-radius: 8px; color: var(--text); font-family: 'JetBrains Mono', monospace;
     font-size: 12px; padding: 10px 12px; resize: vertical; min-height: 80px;
     outline: none; line-height: 1.6; transition: border-color 0.2s;
   }
@@ -1235,7 +1235,7 @@
 
   select, input[type=&quot;number&quot;], input[type=&quot;text&quot;] {
     background: var(--bg); border: 1px solid var(--border);
-    border-radius: 6px; color: var(--text); font-family: 'DM Mono', monospace;
+    border-radius: 6px; color: var(--text); font-family: 'JetBrains Mono', monospace;
     font-size: 12px; padding: 6px 9px; outline: none; width: 100%; transition: border-color 0.2s;
   }
   select:focus, input[type=&quot;number&quot;]:focus, input[type=&quot;text&quot;]:focus { border-color: var(--accent); }
@@ -1251,19 +1251,19 @@
     padding: 0; cursor: pointer; border-radius: 3px; outline: none; flex-shrink: 0;
   }
   .hex-input {
-    font-size: 12px; color: var(--text); font-family: 'DM Mono', monospace;
+    font-size: 12px; color: var(--text); font-family: 'JetBrains Mono', monospace;
     background: none; border: none; outline: none; width: 62px;
   }
 
   /* Preset chips */
   .preset-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
   .chip {
-    font-family: 'DM Mono', monospace; font-size: 10px; padding: 3px 9px;
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 3px 9px;
     border-radius: 99px; border: 1px solid var(--border);
     background: transparent; color: var(--muted); cursor: pointer; transition: all 0.15s;
   }
   .chip:hover { border-color: var(--accent); color: var(--accent); }
-  .chip.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 600; }
+  .chip.active { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
 
   /* Palettes */
   .palettes-grid {
@@ -1347,11 +1347,11 @@
     display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
   }
   .btn {
-    font-family: 'DM Mono', monospace; font-size: 12px; padding: 7px 13px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 7px 13px;
     border-radius: 6px; border: 1px solid var(--border); cursor: pointer;
     transition: all 0.15s; display: flex; align-items: center; gap: 5px; white-space: nowrap;
   }
-  .btn-primary { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 500; }
+  .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
   .btn-primary:hover { background: #cc1f1f; }
   .btn-ghost { background: transparent; color: var(--text); }
   .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
@@ -1367,8 +1367,8 @@
 
   .preview-area {
     flex: 1; overflow: hidden; display: flex; align-items: center; justify-content: center; padding: 28px;
-    background: radial-gradient(ellipse at 20% 80%, #1a1a00 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 20%, #0a0a1a 0%, transparent 50%), var(--bg);
+    background: radial-gradient(ellipse at 20% 80%, #1a0000 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, #0a000a 0%, transparent 50%), var(--bg);
   }
   .preview-wrapper { position: relative; }
   .preview-shadow {
@@ -1407,7 +1407,7 @@
     background: #fff; left: 3px; top: 3px; transition: transform 0.2s;
   }
   .toggle input:checked + .toggle-slider { background: var(--accent); }
-  .toggle input:checked + .toggle-slider::before { transform: translateX(16px); background: #000; }
+  .toggle input:checked + .toggle-slider::before { transform: translateX(16px); background: #fff; }
 
   /* Border controls */
   .border-controls { margin-top: 10px; display: none; }
@@ -1432,19 +1432,19 @@
     display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 8px;
   }
   .corner-btn {
-    font-family: 'DM Mono', monospace; font-size: 11px;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
     padding: 5px 4px; border-radius: 5px; border: 1px solid var(--border);
     background: transparent; color: var(--muted); cursor: pointer;
     transition: all 0.15s; text-align: center;
   }
   .corner-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .corner-btn.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 600; }
+  .corner-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>Slide<span>Export</span></h1>
+  <span class=&quot;topbar-title&quot;>Slide Export</span>
   <span class=&quot;badge&quot;>PNG</span>
   <span class=&quot;badge&quot; id=&quot;size-badge&quot;>1920 × 1080</span>
 </header>
@@ -1458,8 +1458,8 @@
     <textarea id=&quot;text-input&quot; placeholder=&quot;P1&amp;#10;BACKGROUND&amp;#10;TIMER&amp;#10;VT 2&quot; rows=&quot;5&quot;></textarea>
     <p class=&quot;hint&quot;>One line = one slide.</p>
     <div class=&quot;row r2&quot; style=&quot;margin-top:8px;&quot;>
-      <button class=&quot;btn btn-primary&quot; onclick=&quot;generateSlides()&quot;>▶ Generate</button>
-      <button class=&quot;btn btn-ghost&quot; onclick=&quot;clearAll()&quot;>✕ Clear</button>
+      <button class=&quot;btn btn-primary&quot; onclick=&quot;generateSlides()&quot;>Generate</button>
+      <button class=&quot;btn btn-ghost&quot; onclick=&quot;clearAll()&quot;>Clear</button>
     </div>
   </div>
 
@@ -1503,8 +1503,8 @@
       </div>
       <div class=&quot;field&quot;><label>Font Family</label>
         <select id=&quot;font-family&quot; onchange=&quot;updatePreview()&quot;>
-          <option value=&quot;'Syne', sans-serif&quot;>Syne</option>
-          <option value=&quot;'DM Mono', monospace&quot;>DM Mono</option>
+          <option value=&quot;'DM Sans', sans-serif&quot;>Syne</option>
+          <option value=&quot;'JetBrains Mono', monospace&quot;>DM Mono</option>
           <option value=&quot;Georgia, serif&quot;>Georgia</option>
           <option value=&quot;Arial, sans-serif&quot;>Arial</option>
           <option value=&quot;'Courier New', monospace&quot;>Courier New</option>
@@ -1637,7 +1637,7 @@
       </div>
       <div class=&quot;row r2&quot; style=&quot;gap:8px;margin-top:8px;&quot;>
         <button class=&quot;btn btn-ghost&quot; style=&quot;font-size:11px;padding:5px;&quot; onclick=&quot;applyPaletteToSlide()&quot;>← Use default colours</button>
-        <button class=&quot;btn btn-ghost&quot; style=&quot;font-size:11px;padding:5px;color:#ef4444;border-color:#ef4444;&quot; onclick=&quot;clearSlideColor()&quot;>✕ Clear override</button>
+        <button class=&quot;btn btn-ghost&quot; style=&quot;font-size:11px;padding:5px;color:#ef4444;border-color:#ef4444;&quot; onclick=&quot;clearSlideColor()&quot;>Clear override</button>
       </div>
 
       <!-- Corner slash -->
@@ -1685,9 +1685,9 @@
       <button class=&quot;btn btn-ghost nav-btn&quot; onclick=&quot;navigate(-1)&quot;>‹</button>
       <button class=&quot;btn btn-ghost nav-btn&quot; onclick=&quot;navigate(1)&quot;>›</button>
     </div>
-    <button class=&quot;btn btn-resistor&quot; id=&quot;resistor-all-btn&quot; onclick=&quot;applyResistorAll()&quot; title=&quot;Auto-assign resistor colour codes to all slides by slide number&quot;>⚡ Resistor Auto</button>
-    <button class=&quot;btn btn-ghost&quot; onclick=&quot;exportCurrent()&quot;>⬇ Export Current</button>
-    <button class=&quot;btn btn-primary&quot; onclick=&quot;exportAll()&quot;>⬇ Export All as ZIP</button>
+    <button class=&quot;btn btn-resistor&quot; id=&quot;resistor-all-btn&quot; onclick=&quot;applyResistorAll()&quot; title=&quot;Auto-assign resistor colour codes to all slides by slide number&quot;>Resistor Auto</button>
+    <button class=&quot;btn btn-ghost&quot; onclick=&quot;exportCurrent()&quot;>Export Current</button>
+    <button class=&quot;btn btn-primary&quot; onclick=&quot;exportAll()&quot;>Export All as ZIP</button>
     <span class=&quot;slide-counter&quot; id=&quot;slide-counter&quot;>No slides</span>
   </div>
 
@@ -1705,8 +1705,7 @@
       </div>
     </div>
     <div id=&quot;empty-state&quot; class=&quot;empty-state&quot;>
-      <p style=&quot;font-size:28px;margin-bottom:10px;&quot;>📋</p>
-      <p>Enter text and click Generate</p>
+      <p>Enter text above and click Generate</p>
     </div>
   </div>
 </div>
@@ -2165,7 +2164,7 @@ function renderPalettes() {
     const swatch = document.createElement('div'); swatch.className = 'palette-swatch'; swatch.title = p.name;
     swatch.innerHTML = `
       <div class=&quot;swatch-top&quot; style=&quot;background:${p.bg};&quot;></div>
-      <div class=&quot;swatch-bot&quot; style=&quot;background:${p.bg};color:${p.text};font-family:'DM Mono',monospace;&quot;>Aa</div>
+      <div class=&quot;swatch-bot&quot; style=&quot;background:${p.bg};color:${p.text};font-family:'JetBrains Mono',monospace;&quot;>Aa</div>
       <button class=&quot;swatch-del&quot; onclick=&quot;deletePalette(${i},event)&quot;>✕</button>`;
     swatch.onclick = () => applyPalette(i);
     const lbl = document.createElement('div'); lbl.className = 'palette-name'; lbl.textContent = p.name;
@@ -2337,7 +2336,8 @@ window.addEventListener('load', () => {
 });
 </script>
 </body>
-</html>" sandbox="allow-scripts allow-same-origin allow-downloads allow-modals"></iframe>
+</html>
+" sandbox="allow-scripts allow-same-origin allow-downloads allow-modals"></iframe>
 </div>
 
 <script>
