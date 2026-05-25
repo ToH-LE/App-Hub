@@ -1,0 +1,2352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>App Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0a;
+    --bar: #0f0f0f;
+    --border: #1e1e1e;
+    --accent: #ff3333;
+    --text: #f0f0f0;
+    --muted: #555;
+    --nav-h: 48px;
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    overflow: hidden;
+  }
+
+  /* ── Top nav bar ── */
+  #nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: var(--nav-h);
+    background: var(--bar);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 6px;
+    z-index: 1000;
+  }
+
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    margin-right: 10px;
+    white-space: nowrap;
+  }
+
+  .nav-logo span { color: var(--accent); }
+
+  .nav-sep {
+    width: 1px;
+    height: 22px;
+    background: var(--border);
+    margin-right: 6px;
+  }
+
+  .nav-tab {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    padding: 5px 13px;
+    border-radius: 5px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .nav-tab .icon { font-size: 13px; }
+  .nav-tab:hover { color: var(--text); background: #161616; }
+
+  .nav-tab.active {
+    background: var(--accent);
+    color: #000;
+    font-weight: 500;
+    border-color: var(--accent);
+  }
+
+  /* ── Iframe panels ── */
+  .panel {
+    position: fixed;
+    top: var(--nav-h);
+    left: 0; right: 0; bottom: 0;
+    display: none;
+  }
+
+  .panel.active { display: block; }
+
+  .panel iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+  }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <span class="nav-logo">App<span>Hub</span></span>
+  <div class="nav-sep"></div>
+  <button class="nav-tab active" data-panel="colour" onclick="showPanel('colour')">
+    <span class="icon">🎨</span> Colour Converter
+  </button>
+  <button class="nav-tab" data-panel="lightengine" onclick="showPanel('lightengine')">
+    <span class="icon">📺</span> Test Pattern
+  </button>
+  <button class="nav-tab" data-panel="slides" onclick="showPanel('slides')">
+    <span class="icon">🖼️</span> Slide Export
+  </button>
+</nav>
+
+<div class="panel active" id="panel-colour">
+  <iframe srcdoc="<!DOCTYPE html>
+<html lang=&quot;en&quot;>
+<head>
+<meta charset=&quot;UTF-8&quot;>
+<meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;>
+<title>Colour Converter</title>
+<link href=&quot;https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&amp;family=DM+Sans:wght@300;400;500;600&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --panel: #131313;
+    --surface2: #1a1a1a;
+    --border: #252525;
+    --accent: #ff3333;
+    --text: #f0f0f0;
+    --muted: #555;
+    --radius: 3px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: &quot;DM Sans&quot;, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── Top bar ── */
+  #topbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 16px;
+    height: 46px;
+    background: #000;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .topbar-title {
+    font-family: &quot;JetBrains Mono&quot;, monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+
+  .topbar-sep { flex: 1; }
+
+  .badge {
+    font-family: &quot;JetBrains Mono&quot;, monospace;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 99px;
+    background: var(--accent);
+    color: #000;
+  }
+
+  /* ── Main layout ── */
+  #main {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+  }
+
+  /* ── Sidebar / controls ── */
+  #side {
+    width: 260px;
+    flex-shrink: 0;
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .panel-section {
+    padding: 14px 15px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .panel-label {
+    font-family: &quot;JetBrains Mono&quot;, monospace;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+  .field:last-child { margin-bottom: 0; }
+
+  .field label {
+    font-family: &quot;JetBrains Mono&quot;, monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .input-row { display: flex; gap: 6px; }
+
+  input[type=text], input[type=number] {
+    width: 100%;
+    background: #0d0d0d;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: &quot;JetBrains Mono&quot;, monospace;
+    font-size: 12px;
+    padding: 7px 9px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  input[type=text]:focus, input[type=number]:focus {
+    border-color: var(--accent);
+  }
+
+  /* Remove number spinners */
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+  .channel-label {
+    font-family: &quot;JetBrains Mono&quot;, monospace;
+    font-size: 10px;
+    color: var(--muted);
+    text-align: center;
+    letter-spacing: 1px;
+  }
+
+  .channel-group { display: flex; flex-direction: column; gap: 3px; flex: 1; }
+
+  /* Buttons */
+  .btn {
+    font-family: &quot;JetBrains Mono&quot;, monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 8px 12px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.15s;
+    width: 100%;
+    margin-top: 4px;
+    background: transparent;
+    color: var(--text);
+  }
+  .btn:hover { border-color: var(--text); }
+
+  .btn-accent {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #000;
+    font-weight: 700;
+  }
+  .btn-accent:hover { background: #cc1f1f; border-color: #cc1f1f; }
+
+  /* ── Preview area ── */
+  #preview-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    padding: 32px;
+    background:
+      radial-gradient(ellipse at 30% 70%, rgba(232,255,71,0.03) 0%, transparent 60%),
+      var(--bg);
+  }
+
+  #color-swatch {
+    width: 100%;
+    max-width: 420px;
+    aspect-ratio: 16/7;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: #1a1a1a;
+    transition: background 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #color-swatch::after {
+    content: attr(data-hex);
+    position: absolute;
+    bottom: 12px;
+    right: 14px;
+    font-family: &quot;JetBrains Mono&quot;, monospace;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.5);
+    mix-blend-mode: difference;
+    filter: invert(0);
+    text-transform: uppercase;
+  }
+
+  /* Output grid */
+  #output-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    width: 100%;
+    max-width: 420px;
+  }
+
+  .out-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 10px 12px;
+  }
+
+  .out-card-label {
+    font-family: &quot;JetBrains Mono&quot;, monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .out-card-val {
+    font-family: &quot;JetBrains Mono&quot;, monospace;
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: 500;
+    line-height: 1.6;
+  }
+
+  /* Error */
+  .error-msg {
+    font-family: &quot;JetBrains Mono&quot;, monospace;
+    font-size: 11px;
+    color: #ff6b6b;
+    letter-spacing: 0.5px;
+    min-height: 16px;
+    padding: 0 15px 10px;
+  }
+
+  /* Scrollbar */
+  #side::-webkit-scrollbar { width: 4px; }
+  #side::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<div id=&quot;topbar&quot;>
+  <span class=&quot;topbar-title&quot;>Colour Converter</span>
+  <div class=&quot;topbar-sep&quot;></div>
+  <span class=&quot;badge&quot;>8 · 10 · Hex</span>
+</div>
+
+<div id=&quot;main&quot;>
+
+  <div id=&quot;side&quot;>
+
+    <!-- HEX -->
+    <div class=&quot;panel-section&quot;>
+      <div class=&quot;panel-label&quot;>Hex</div>
+      <div class=&quot;field&quot;>
+        <input type=&quot;text&quot; id=&quot;hex&quot; placeholder=&quot;#FF8800&quot; oninput=&quot;liveConvert('hex')&quot;>
+      </div>
+    </div>
+
+    <!-- 8-BIT -->
+    <div class=&quot;panel-section&quot;>
+      <div class=&quot;panel-label&quot;>RGB 8-bit &amp;nbsp;(0 – 255)</div>
+      <div class=&quot;input-row&quot;>
+        <div class=&quot;channel-group&quot;>
+          <input type=&quot;number&quot; id=&quot;r8&quot; min=&quot;0&quot; max=&quot;255&quot; placeholder=&quot;0&quot; oninput=&quot;liveConvert('8bit')&quot;>
+          <div class=&quot;channel-label&quot;>R</div>
+        </div>
+        <div class=&quot;channel-group&quot;>
+          <input type=&quot;number&quot; id=&quot;g8&quot; min=&quot;0&quot; max=&quot;255&quot; placeholder=&quot;0&quot; oninput=&quot;liveConvert('8bit')&quot;>
+          <div class=&quot;channel-label&quot;>G</div>
+        </div>
+        <div class=&quot;channel-group&quot;>
+          <input type=&quot;number&quot; id=&quot;b8&quot; min=&quot;0&quot; max=&quot;255&quot; placeholder=&quot;0&quot; oninput=&quot;liveConvert('8bit')&quot;>
+          <div class=&quot;channel-label&quot;>B</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 10-BIT -->
+    <div class=&quot;panel-section&quot;>
+      <div class=&quot;panel-label&quot;>RGB 10-bit &amp;nbsp;(0 – 1023)</div>
+      <div class=&quot;input-row&quot;>
+        <div class=&quot;channel-group&quot;>
+          <input type=&quot;number&quot; id=&quot;r10&quot; min=&quot;0&quot; max=&quot;1023&quot; placeholder=&quot;0&quot; oninput=&quot;liveConvert('10bit')&quot;>
+          <div class=&quot;channel-label&quot;>R</div>
+        </div>
+        <div class=&quot;channel-group&quot;>
+          <input type=&quot;number&quot; id=&quot;g10&quot; min=&quot;0&quot; max=&quot;1023&quot; placeholder=&quot;0&quot; oninput=&quot;liveConvert('10bit')&quot;>
+          <div class=&quot;channel-label&quot;>G</div>
+        </div>
+        <div class=&quot;channel-group&quot;>
+          <input type=&quot;number&quot; id=&quot;b10&quot; min=&quot;0&quot; max=&quot;1023&quot; placeholder=&quot;0&quot; oninput=&quot;liveConvert('10bit')&quot;>
+          <div class=&quot;channel-label&quot;>B</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class=&quot;panel-section&quot;>
+      <div class=&quot;panel-label&quot;>Actions</div>
+      <button class=&quot;btn btn-accent&quot; onclick=&quot;clearAll()&quot;>Clear</button>
+    </div>
+
+    <div class=&quot;error-msg&quot; id=&quot;error-msg&quot;></div>
+
+  </div><!-- /side -->
+
+  <!-- PREVIEW -->
+  <div id=&quot;preview-area&quot;>
+    <div id=&quot;color-swatch&quot; data-hex=&quot;—&quot;></div>
+    <div id=&quot;output-grid&quot;>
+      <div class=&quot;out-card&quot;>
+        <div class=&quot;out-card-label&quot;>Hex</div>
+        <div class=&quot;out-card-val&quot; id=&quot;out-hex&quot;>—</div>
+      </div>
+      <div class=&quot;out-card&quot;>
+        <div class=&quot;out-card-label&quot;>8-bit</div>
+        <div class=&quot;out-card-val&quot; id=&quot;out-8bit&quot;>—</div>
+      </div>
+      <div class=&quot;out-card&quot;>
+        <div class=&quot;out-card-label&quot;>10-bit</div>
+        <div class=&quot;out-card-val&quot; id=&quot;out-10bit&quot;>—</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+  function clamp(v, mn, mx) { return Math.max(mn, Math.min(mx, v)); }
+
+  function setError(msg) {
+    document.getElementById('error-msg').textContent = msg;
+  }
+
+  function updateOutputs(r8, g8, b8) {
+    const r10 = Math.round((r8 / 255) * 1023);
+    const g10 = Math.round((g8 / 255) * 1023);
+    const b10 = Math.round((b8 / 255) * 1023);
+    const hexOut = '#' + [r8, g8, b8].map(v => v.toString(16).padStart(2, '0')).join('');
+
+    // Update swatch
+    const swatch = document.getElementById('color-swatch');
+    swatch.style.background = hexOut;
+    swatch.dataset.hex = hexOut.toUpperCase();
+
+    // Update output cards
+    document.getElementById('out-hex').textContent   = hexOut.toUpperCase();
+    document.getElementById('out-8bit').textContent  = r8 + '\n' + g8 + '\n' + b8;
+    document.getElementById('out-10bit').textContent = r10 + '\n' + g10 + '\n' + b10;
+
+    return { r8, g8, b8, r10, g10, b10, hexOut };
+  }
+
+  function liveConvert(source) {
+    setError('');
+
+    if (source === 'hex') {
+      const raw = document.getElementById('hex').value.trim();
+      if (!raw) return;
+      const clean = raw.startsWith('#') ? raw : '#' + raw;
+      if (!/^#([0-9A-Fa-f]{6})$/.test(clean)) { setError('Invalid hex value'); return; }
+      const r8 = parseInt(clean.substr(1,2),16);
+      const g8 = parseInt(clean.substr(3,2),16);
+      const b8 = parseInt(clean.substr(5,2),16);
+      const out = updateOutputs(r8, g8, b8);
+      document.getElementById('r8').value  = out.r8;
+      document.getElementById('g8').value  = out.g8;
+      document.getElementById('b8').value  = out.b8;
+      document.getElementById('r10').value = out.r10;
+      document.getElementById('g10').value = out.g10;
+      document.getElementById('b10').value = out.b10;
+    }
+
+    else if (source === '8bit') {
+      const ri = document.getElementById('r8').value;
+      const gi = document.getElementById('g8').value;
+      const bi = document.getElementById('b8').value;
+      if (ri === '' || gi === '' || bi === '') return;
+      const r8 = clamp(parseInt(ri), 0, 255);
+      const g8 = clamp(parseInt(gi), 0, 255);
+      const b8 = clamp(parseInt(bi), 0, 255);
+      const out = updateOutputs(r8, g8, b8);
+      document.getElementById('hex').value  = out.hexOut.toUpperCase();
+      document.getElementById('r10').value  = out.r10;
+      document.getElementById('g10').value  = out.g10;
+      document.getElementById('b10').value  = out.b10;
+    }
+
+    else if (source === '10bit') {
+      const ri = document.getElementById('r10').value;
+      const gi = document.getElementById('g10').value;
+      const bi = document.getElementById('b10').value;
+      if (ri === '' || gi === '' || bi === '') return;
+      const r10 = clamp(parseInt(ri), 0, 1023);
+      const g10 = clamp(parseInt(gi), 0, 1023);
+      const b10 = clamp(parseInt(bi), 0, 1023);
+      const r8  = Math.round((r10 / 1023) * 255);
+      const g8  = Math.round((g10 / 1023) * 255);
+      const b8  = Math.round((b10 / 1023) * 255);
+      const out = updateOutputs(r8, g8, b8);
+      document.getElementById('hex').value = out.hexOut.toUpperCase();
+      document.getElementById('r8').value  = out.r8;
+      document.getElementById('g8').value  = out.g8;
+      document.getElementById('b8').value  = out.b8;
+    }
+  }
+
+  function clearAll() {
+    ['hex','r8','g8','b8','r10','g10','b10'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    const swatch = document.getElementById('color-swatch');
+    swatch.style.background = '#1a1a1a';
+    swatch.dataset.hex = '—';
+    document.getElementById('out-hex').textContent   = '—';
+    document.getElementById('out-8bit').textContent  = '—';
+    document.getElementById('out-10bit').textContent = '—';
+    setError('');
+  }
+</script>
+</body>
+</html>" sandbox="allow-scripts allow-same-origin"></iframe>
+</div>
+
+<div class="panel" id="panel-lightengine">
+  <iframe srcdoc="<!DOCTYPE html>
+<html lang=&quot;en&quot;>
+<head>
+<meta charset=&quot;UTF-8&quot;>
+<meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;>
+<title>Test Pattern</title>
+<link href=&quot;https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&amp;family=DM+Sans:wght@300;400;500;600&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --panel: #131313;
+    --border: #252525;
+    --accent: #ff3333;
+    --text: #f0f0f0;
+    --muted: #555;
+    --radius: 3px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  #topbar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 0 16px;
+    height: 46px;
+    background: #000;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .topbar-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+
+  .topbar-sep { flex: 1; }
+
+  .btn-icon {
+    width: 30px; height: 30px;
+    display: flex; align-items: center; justify-content: center;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .btn-icon:hover { border-color: var(--accent); color: var(--accent); }
+
+  #main {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+  }
+
+  #canvas-wrap {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    background: #000;
+  }
+
+  #canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  #side {
+    width: 255px;
+    flex-shrink: 0;
+    background: var(--panel);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  #side::-webkit-scrollbar { width: 4px; }
+  #side::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .panel-section {
+    padding: 13px 15px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .panel-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .ctrl-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 9px;
+  }
+  .ctrl-label { font-size: 12px; color: #bbb; }
+
+  .toggle {
+    position: relative;
+    width: 36px; height: 20px;
+    flex-shrink: 0;
+  }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute; inset: 0;
+    background: #222;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: 0.2s;
+    border: 1px solid #333;
+  }
+  .toggle-slider::before {
+    content: '';
+    position: absolute;
+    width: 14px; height: 14px;
+    left: 2px; top: 2px;
+    background: #444;
+    border-radius: 50%;
+    transition: 0.2s;
+  }
+  .toggle input:checked + .toggle-slider { background: var(--accent); border-color: var(--accent); }
+  .toggle input:checked + .toggle-slider::before {
+    background: #fff;
+    transform: translateX(16px);
+  }
+
+  input[type=number] {
+    width: 100%;
+    background: #0d0d0d;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 6px 9px;
+    outline: none;
+    transition: border-color 0.15s;
+    margin-top: 4px;
+  }
+  input[type=number]:focus { border-color: var(--accent); }
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+  .color-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 7px;
+    margin-top: 4px;
+  }
+  .color-item { display: flex; flex-direction: column; gap: 4px; }
+  .color-item label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+  input[type=color] {
+    width: 100%; height: 28px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: transparent;
+    cursor: pointer;
+    padding: 2px;
+  }
+
+  .btn {
+    width: 100%;
+    padding: 8px 12px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+    margin-top: 6px;
+  }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .btn-accent {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    font-weight: 700;
+  }
+  .btn-accent:hover { background: #cc1f1f; border-color: #cc1f1f; color: #fff; }
+
+  .preset-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    margin-bottom: 6px;
+  }
+  .preset-btn {
+    margin-top: 0;
+    padding: 6px 4px;
+    font-size: 10px;
+    letter-spacing: 0.5px;
+  }
+
+  .spacer { flex: 1; }
+</style>
+</head>
+<body>
+
+<div id=&quot;topbar&quot;>
+  <span class=&quot;topbar-title&quot;>Test Pattern</span>
+  <div class=&quot;topbar-sep&quot;></div>
+  <button class=&quot;btn-icon&quot; id=&quot;fs-btn&quot; title=&quot;Fullscreen (F)&quot;>⛶</button>
+</div>
+
+<div id=&quot;main&quot;>
+  <div id=&quot;canvas-wrap&quot;>
+    <canvas id=&quot;canvas&quot;></canvas>
+  </div>
+
+  <div id=&quot;side&quot;>
+
+    <!-- GRID -->
+    <div class=&quot;panel-section&quot;>
+      <div class=&quot;panel-label&quot;>Grid</div>
+      <div class=&quot;ctrl-label&quot; style=&quot;font-size:11px;margin-bottom:4px;color:#777&quot;>Grid Size (px)</div>
+      <input type=&quot;number&quot; id=&quot;grid-size&quot; value=&quot;80&quot; min=&quot;20&quot; max=&quot;400&quot;>
+    </div>
+
+    <!-- OVERLAYS -->
+    <div class=&quot;panel-section&quot;>
+      <div class=&quot;panel-label&quot;>Overlays</div>
+      <div class=&quot;ctrl-row&quot;>
+        <span class=&quot;ctrl-label&quot;>Corner Markers</span>
+        <label class=&quot;toggle&quot;><input type=&quot;checkbox&quot; id=&quot;show-corners&quot; checked><span class=&quot;toggle-slider&quot;></span></label>
+      </div>
+      <div class=&quot;ctrl-row&quot; style=&quot;margin-bottom:0&quot;>
+        <span class=&quot;ctrl-label&quot;>Centre Cross</span>
+        <label class=&quot;toggle&quot;><input type=&quot;checkbox&quot; id=&quot;show-cross&quot; checked><span class=&quot;toggle-slider&quot;></span></label>
+      </div>
+    </div>
+
+    <!-- COLOURS -->
+    <div class=&quot;panel-section&quot;>
+      <div class=&quot;panel-label&quot;>Colours</div>
+      <div class=&quot;color-row&quot;>
+        <div class=&quot;color-item&quot;><label>BG</label><input type=&quot;color&quot; id=&quot;col-bg&quot; value=&quot;#000000&quot;></div>
+        <div class=&quot;color-item&quot;><label>Grid</label><input type=&quot;color&quot; id=&quot;col-grid&quot; value=&quot;#333333&quot;></div>
+        <div class=&quot;color-item&quot;><label>Circles</label><input type=&quot;color&quot; id=&quot;col-circle&quot; value=&quot;#ffffff&quot;></div>
+        <div class=&quot;color-item&quot;><label>Cross</label><input type=&quot;color&quot; id=&quot;col-cross&quot; value=&quot;#ff3333&quot;></div>
+      </div>
+    </div>
+
+
+    <!-- BORDER -->
+    <div class=&quot;panel-section&quot;>
+      <div class=&quot;panel-label&quot;>Border</div>
+      <div class=&quot;ctrl-row&quot;>
+        <span class=&quot;ctrl-label&quot;>Show Border</span>
+        <label class=&quot;toggle&quot;><input type=&quot;checkbox&quot; id=&quot;show-border&quot; checked><span class=&quot;toggle-slider&quot;></span></label>
+      </div>
+      <div class=&quot;ctrl-label&quot; style=&quot;font-size:11px;margin-bottom:4px;color:#777;margin-top:6px&quot;>Thickness (px)</div>
+      <input type=&quot;number&quot; id=&quot;border-w&quot; value=&quot;2&quot; min=&quot;1&quot; max=&quot;100&quot;>
+      <div class=&quot;color-row&quot; style=&quot;margin-top:8px&quot;>
+        <div class=&quot;color-item&quot;><label>Colour</label><input type=&quot;color&quot; id=&quot;col-border&quot; value=&quot;#ff3333&quot;></div>
+      </div>
+    </div>
+
+    <!-- EXPORT -->
+    <div class=&quot;panel-section&quot;>
+      <div class=&quot;panel-label&quot;>Export</div>
+      <div class=&quot;preset-grid&quot;>
+        <button class=&quot;btn preset-btn&quot; data-w=&quot;1920&quot; data-h=&quot;1080&quot;>1920×1080</button>
+        <button class=&quot;btn preset-btn&quot; data-w=&quot;3840&quot; data-h=&quot;2160&quot;>3840×2160</button>
+        <button class=&quot;btn preset-btn&quot; data-w=&quot;2560&quot; data-h=&quot;1440&quot;>2560×1440</button>
+        <button class=&quot;btn preset-btn&quot; data-w=&quot;1280&quot; data-h=&quot;720&quot;>1280×720</button>
+        <button class=&quot;btn preset-btn&quot; data-w=&quot;4096&quot; data-h=&quot;2160&quot;>4096×2160</button>
+        <button class=&quot;btn preset-btn&quot; data-w=&quot;1024&quot; data-h=&quot;768&quot;>1024×768</button>
+      </div>
+      <div style=&quot;display:flex;align-items:center;gap:6px;margin-bottom:6px;margin-top:4px&quot;>
+        <input type=&quot;number&quot; id=&quot;export-w&quot; value=&quot;1920&quot; min=&quot;1&quot; max=&quot;16000&quot; style=&quot;margin-top:0;text-align:center&quot;>
+        <span style=&quot;color:#555;font-size:12px;flex-shrink:0&quot;>×</span>
+        <input type=&quot;number&quot; id=&quot;export-h&quot; value=&quot;1080&quot; min=&quot;1&quot; max=&quot;16000&quot; style=&quot;margin-top:0;text-align:center&quot;>
+      </div>
+      <button class=&quot;btn btn-accent&quot; id=&quot;export-btn&quot;>Export PNG</button>
+    </div>
+
+    <div class=&quot;spacer&quot;></div>
+
+  </div>
+</div>
+
+<script>
+  const canvas = document.getElementById('canvas');
+  const ctx    = canvas.getContext('2d');
+
+  // ── State ──
+  const state = {
+    gridSize:  80,
+    corners:   true,
+    cross:     true,
+    bg:        '#000000',
+    gridCol:   '#333333',
+    circleCol: '#ffffff',
+    crossCol:  '#ff3333',
+  };
+
+  // ── Draw ──
+  function draw() {
+    const W = canvas.width;
+    const H = canvas.height;
+    const gs = Math.max(10, state.gridSize);
+    const cx = W / 2, cy = H / 2;
+
+    ctx.fillStyle = state.bg;
+    ctx.fillRect(0, 0, W, H);
+
+    // Grid
+    ctx.strokeStyle = state.gridCol;
+    ctx.lineWidth = 0.75;
+    for (let x = cx % gs; x <= W; x += gs) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+    for (let x = cx % gs - gs; x >= 0; x -= gs) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+    for (let y = cy % gs; y <= H; y += gs) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+    for (let y = cy % gs - gs; y >= 0; y -= gs) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+    // Grid labels
+    const labelFs = Math.max(9, Math.min(gs * 0.28, 16));
+    ctx.font = `500 ${labelFs}px 'JetBrains Mono', monospace`;
+    ctx.fillStyle = state.gridCol;
+    ctx.globalAlpha = 0.7;
+    const rowTop    = ['E','D','C','B','A'];
+    const rowBottom = ['a','b','c','d','e'];
+    let ci = 1;
+    for (let x = cx + gs; x < W; x += gs, ci++) {
+      ctx.textAlign = 'center'; ctx.textBaseline = 'top';    ctx.fillText(ci,  x, 4);
+      ctx.textBaseline = 'bottom'; ctx.fillText(ci,  x, H-4);
+    }
+    ci = 1;
+    for (let x = cx - gs; x > 0; x -= gs, ci++) {
+      ctx.textAlign = 'center'; ctx.textBaseline = 'top';    ctx.fillText(-ci, x, 4);
+      ctx.textBaseline = 'bottom'; ctx.fillText(-ci, x, H-4);
+    }
+    let ri = 0;
+    for (let y = cy - gs; y > 0; y -= gs, ri++) {
+      const l = rowTop[Math.min(ri, rowTop.length-1)];
+      ctx.textAlign='left';  ctx.textBaseline='middle'; ctx.fillText(l, 4,   y);
+      ctx.textAlign='right';                            ctx.fillText(l, W-4, y);
+    }
+    ri = 0;
+    for (let y = cy + gs; y < H; y += gs, ri++) {
+      const l = rowBottom[Math.min(ri, rowBottom.length-1)];
+      ctx.textAlign='left';  ctx.textBaseline='middle'; ctx.fillText(l, 4,   y);
+      ctx.textAlign='right';                            ctx.fillText(l, W-4, y);
+    }
+    ctx.globalAlpha = 1;
+
+    // Diagonal corner lines
+    ctx.strokeStyle = state.gridCol;
+    ctx.lineWidth = 1;
+    ctx.globalAlpha = 0.55;
+    [[0,0],[W,0],[0,H],[W,H]].forEach(([px,py]) => {
+      ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(cx,cy); ctx.stroke();
+    });
+    ctx.globalAlpha = 1;
+
+    // Circles
+    const r = H / 2;
+    ctx.strokeStyle = state.circleCol;
+    ctx.lineWidth = 1.5;
+    ctx.globalAlpha = 0.9;
+    [cx, 0, W].forEach(x => {
+      ctx.beginPath(); ctx.arc(x, cy, r, 0, Math.PI*2); ctx.stroke();
+    });
+    ctx.globalAlpha = 1;
+
+    // Centre cross
+    if (state.cross) {
+      ctx.strokeStyle = state.crossCol;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(0, cy); ctx.lineTo(W, cy);
+      ctx.moveTo(cx, 0); ctx.lineTo(cx, H);
+      ctx.stroke();
+      ctx.fillStyle = state.crossCol;
+      ctx.beginPath(); ctx.arc(cx, cy, 4, 0, Math.PI*2); ctx.fill();
+      ctx.strokeStyle = state.crossCol; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(cx, cy, 14, 0, Math.PI*2); ctx.stroke();
+    }
+
+    // Corner markers
+    if (state.corners) {
+      const mk = Math.min(gs * 0.8, 40);
+      ctx.strokeStyle = state.crossCol;
+      ctx.lineWidth = 1.5;
+      [[0,0],[W,0],[0,H],[W,H]].forEach(([px,py]) => {
+        const dx = px===0?1:-1, dy = py===0?1:-1;
+        ctx.beginPath();
+        ctx.moveTo(px,py); ctx.lineTo(px+dx*mk, py);
+        ctx.moveTo(px,py); ctx.lineTo(px, py+dy*mk);
+        ctx.stroke();
+      });
+      const tick = Math.min(gs*0.5, 24);
+      [[cx,0,0,tick],[cx,H,0,-tick],[0,cy,tick,0],[W,cy,-tick,0]].forEach(([x,y,dx,dy]) => {
+        ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x+dx,y+dy); ctx.stroke();
+      });
+    }
+
+    // Resolution watermark
+    const fs = Math.max(12, Math.min(W,H)*0.028);
+    ctx.font = `600 ${fs}px 'JetBrains Mono', monospace`;
+    ctx.fillStyle = '#fff';
+    ctx.globalAlpha = 0.6;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(`${W}px × ${H}px`, cx, cy - H*0.13);
+    ctx.globalAlpha = 1;
+
+    // Border
+    if (state.showBorder) {
+      const bw = Math.max(1, state.borderW);
+      ctx.strokeStyle = state.borderCol;
+      ctx.lineWidth = bw;
+      ctx.strokeRect(bw/2, bw/2, W - bw, H - bw);
+    }
+  }
+
+  // ── Resize ──
+  function resize() {
+    const wrap = document.getElementById('canvas-wrap');
+    canvas.width  = wrap.clientWidth;
+    canvas.height = wrap.clientHeight;
+    draw();
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+
+  // ── Controls ──
+  function bind(id, key, type) {
+    const el = document.getElementById(id);
+    el.addEventListener('input', () => {
+      state[key] = type === 'bool' ? el.checked : type === 'num' ? (parseInt(el.value)||80) : el.value;
+      draw();
+    });
+  }
+
+  bind('grid-size',   'gridSize',   'num');
+  bind('show-corners','corners',    'bool');
+  bind('show-cross',  'cross',      'bool');
+  bind('col-bg',      'bg',         'str');
+  bind('col-grid',    'gridCol',    'str');
+  bind('col-circle',  'circleCol',  'str');
+  bind('col-cross',   'crossCol',   'str');
+  bind('show-border', 'showBorder', 'bool');
+  bind('border-w',    'borderW',    'num');
+  bind('col-border',  'borderCol',  'str');
+
+  // Preset buttons
+  document.querySelectorAll('.preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.getElementById('export-w').value = btn.dataset.w;
+      document.getElementById('export-h').value = btn.dataset.h;
+    });
+  });
+
+  // Export
+  document.getElementById('export-btn').addEventListener('click', () => {
+    const W = parseInt(document.getElementById('export-w').value) || 1920;
+    const H = parseInt(document.getElementById('export-h').value) || 1080;
+    const offscreen = document.createElement('canvas');
+    offscreen.width  = W;
+    offscreen.height = H;
+    const octx = offscreen.getContext('2d');
+    // Temporarily swap ctx to offscreen
+    const realCtx = ctx;
+    Object.defineProperty(window, 'ctx', { value: octx, configurable: true });
+    // Save canvas size, draw at export size
+    const savedW = canvas.width, savedH = canvas.height;
+    canvas.width = W; canvas.height = H;
+    // Draw on offscreen
+    const tmpCanvas = canvas;
+    offscreen.getContext('2d');
+    // Use a self-contained export draw
+    exportDraw(octx, W, H);
+    // Restore
+    canvas.width = savedW; canvas.height = savedH;
+    draw();
+    // Download
+    const a = document.createElement('a');
+    a.download = `test-pattern-${W}x${H}.png`;
+    a.href = offscreen.toDataURL('image/png');
+    a.click();
+  });
+
+  function exportDraw(ectx, W, H) {
+    const gs = Math.max(10, state.gridSize);
+    const cx = W/2, cy = H/2;
+
+    ectx.fillStyle = state.bg;
+    ectx.fillRect(0,0,W,H);
+
+    ectx.strokeStyle = state.gridCol; ectx.lineWidth = 0.75;
+    for (let x = cx%gs; x<=W; x+=gs) { ectx.beginPath(); ectx.moveTo(x,0); ectx.lineTo(x,H); ectx.stroke(); }
+    for (let x = cx%gs-gs; x>=0; x-=gs) { ectx.beginPath(); ectx.moveTo(x,0); ectx.lineTo(x,H); ectx.stroke(); }
+    for (let y = cy%gs; y<=H; y+=gs) { ectx.beginPath(); ectx.moveTo(0,y); ectx.lineTo(W,y); ectx.stroke(); }
+    for (let y = cy%gs-gs; y>=0; y-=gs) { ectx.beginPath(); ectx.moveTo(0,y); ectx.lineTo(W,y); ectx.stroke(); }
+
+    const labelFs = Math.max(9, Math.min(gs*0.28,16));
+    ectx.font = `500 ${labelFs}px 'JetBrains Mono', monospace`;
+    ectx.fillStyle = state.gridCol; ectx.globalAlpha = 0.7;
+    const rowTop=['E','D','C','B','A'], rowBottom=['a','b','c','d','e'];
+    let ci=1;
+    for (let x=cx+gs;x<W;x+=gs,ci++){ectx.textAlign='center';ectx.textBaseline='top';ectx.fillText(ci,x,4);ectx.textBaseline='bottom';ectx.fillText(ci,x,H-4);}
+    ci=1;
+    for (let x=cx-gs;x>0;x-=gs,ci++){ectx.textAlign='center';ectx.textBaseline='top';ectx.fillText(-ci,x,4);ectx.textBaseline='bottom';ectx.fillText(-ci,x,H-4);}
+    let ri=0;
+    for (let y=cy-gs;y>0;y-=gs,ri++){const l=rowTop[Math.min(ri,4)];ectx.textAlign='left';ectx.textBaseline='middle';ectx.fillText(l,4,y);ectx.textAlign='right';ectx.fillText(l,W-4,y);}
+    ri=0;
+    for (let y=cy+gs;y<H;y+=gs,ri++){const l=rowBottom[Math.min(ri,4)];ectx.textAlign='left';ectx.textBaseline='middle';ectx.fillText(l,4,y);ectx.textAlign='right';ectx.fillText(l,W-4,y);}
+    ectx.globalAlpha=1;
+
+    ectx.strokeStyle=state.gridCol; ectx.lineWidth=1; ectx.globalAlpha=0.55;
+    [[0,0],[W,0],[0,H],[W,H]].forEach(([px,py])=>{ectx.beginPath();ectx.moveTo(px,py);ectx.lineTo(cx,cy);ectx.stroke();});
+    ectx.globalAlpha=1;
+
+    ectx.strokeStyle=state.circleCol; ectx.lineWidth=1.5; ectx.globalAlpha=0.9;
+    [cx,0,W].forEach(x=>{ectx.beginPath();ectx.arc(x,cy,H/2,0,Math.PI*2);ectx.stroke();});
+    ectx.globalAlpha=1;
+
+    if (state.cross) {
+      ectx.strokeStyle=state.crossCol; ectx.lineWidth=1.5;
+      ectx.beginPath(); ectx.moveTo(0,cy); ectx.lineTo(W,cy); ectx.moveTo(cx,0); ectx.lineTo(cx,H); ectx.stroke();
+      ectx.fillStyle=state.crossCol; ectx.beginPath(); ectx.arc(cx,cy,4,0,Math.PI*2); ectx.fill();
+      ectx.strokeStyle=state.crossCol; ectx.lineWidth=1; ectx.beginPath(); ectx.arc(cx,cy,14,0,Math.PI*2); ectx.stroke();
+    }
+    if (state.corners) {
+      const mk=Math.min(gs*0.8,40);
+      ectx.strokeStyle=state.crossCol; ectx.lineWidth=1.5;
+      [[0,0],[W,0],[0,H],[W,H]].forEach(([px,py])=>{const dx=px===0?1:-1,dy=py===0?1:-1;ectx.beginPath();ectx.moveTo(px,py);ectx.lineTo(px+dx*mk,py);ectx.moveTo(px,py);ectx.lineTo(px,py+dy*mk);ectx.stroke();});
+      const tick=Math.min(gs*0.5,24);
+      [[cx,0,0,tick],[cx,H,0,-tick],[0,cy,tick,0],[W,cy,-tick,0]].forEach(([x,y,dx,dy])=>{ectx.beginPath();ectx.moveTo(x,y);ectx.lineTo(x+dx,y+dy);ectx.stroke();});
+    }
+    const fs=Math.max(12,Math.min(W,H)*0.028);
+    ectx.font=`600 ${fs}px 'JetBrains Mono', monospace`;
+    ectx.fillStyle='#fff'; ectx.globalAlpha=0.6;
+    ectx.textAlign='center'; ectx.textBaseline='middle';
+    ectx.fillText(`${W}px × ${H}px`, cx, cy-H*0.13);
+    ectx.globalAlpha=1;
+
+    if (state.showBorder) {
+      const bw = Math.max(1, state.borderW);
+      ectx.strokeStyle = state.borderCol;
+      ectx.lineWidth = bw;
+      ectx.strokeRect(bw/2, bw/2, W-bw, H-bw);
+    }
+  }
+
+  // Fullscreen
+  document.getElementById('fs-btn').addEventListener('click', () => {
+    const wrap = document.getElementById('canvas-wrap');
+    if (!document.fullscreenElement) wrap.requestFullscreen();
+    else document.exitFullscreen();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'f' || e.key === 'F') document.getElementById('fs-btn').click();
+  });
+  document.addEventListener('fullscreenchange', () => setTimeout(resize, 100));
+</script>
+</body>
+</html>
+"></iframe>
+</div>
+
+<div class="panel" id="panel-slides">
+  <iframe srcdoc="<!DOCTYPE html>
+<html lang=&quot;en&quot;>
+<head>
+<meta charset=&quot;UTF-8&quot;>
+<meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;>
+<title>Slide Exporter</title>
+<link href=&quot;https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&amp;family=Syne:wght@400;600;700;800&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
+<script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js&quot;></script>
+<script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js&quot;></script>
+<style>
+  :root {
+    --bg: #0e0e10; --surface: #18181b; --surface2: #1f1f23;
+    --border: #2a2a2f; --accent: #ff3333; --text: #f4f4f5; --muted: #71717a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Mono', monospace;
+    background: var(--bg); color: var(--text);
+    height: 100vh; overflow: hidden;
+    display: grid;
+    grid-template-columns: 420px 1fr;
+    grid-template-rows: 52px 1fr;
+  }
+
+  header {
+    grid-column: 1/-1; background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; padding: 0 20px; gap: 10px;
+  }
+  header h1 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.5px; }
+  header h1 span { color: var(--accent); }
+  .badge {
+    font-size: 10px; background: var(--accent); color: #000;
+    padding: 2px 8px; border-radius: 99px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase;
+  }
+  #size-badge { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    background: var(--surface); border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden;
+  }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .section { padding: 14px 16px; border-bottom: 1px solid var(--border); }
+  .section-title {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 1px;
+    color: var(--muted); margin-bottom: 10px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  textarea {
+    width: 100%; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text); font-family: 'DM Mono', monospace;
+    font-size: 12px; padding: 10px 12px; resize: vertical; min-height: 80px;
+    outline: none; line-height: 1.6; transition: border-color 0.2s;
+  }
+  textarea:focus { border-color: var(--accent); }
+  textarea::placeholder { color: var(--muted); }
+
+  .row { display: grid; gap: 8px; }
+  .r2 { grid-template-columns: 1fr 1fr; }
+  .r3 { grid-template-columns: 1fr 1fr 1fr; }
+
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field > label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+
+  select, input[type=&quot;number&quot;], input[type=&quot;text&quot;] {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 6px; color: var(--text); font-family: 'DM Mono', monospace;
+    font-size: 12px; padding: 6px 9px; outline: none; width: 100%; transition: border-color 0.2s;
+  }
+  select:focus, input[type=&quot;number&quot;]:focus, input[type=&quot;text&quot;]:focus { border-color: var(--accent); }
+
+  .color-wrap {
+    display: flex; align-items: center; gap: 7px;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 6px; padding: 5px 9px; transition: border-color 0.2s;
+  }
+  .color-wrap:focus-within { border-color: var(--accent); }
+  input[type=&quot;color&quot;] {
+    width: 20px; height: 20px; border: none; background: none;
+    padding: 0; cursor: pointer; border-radius: 3px; outline: none; flex-shrink: 0;
+  }
+  .hex-input {
+    font-size: 12px; color: var(--text); font-family: 'DM Mono', monospace;
+    background: none; border: none; outline: none; width: 62px;
+  }
+
+  /* Preset chips */
+  .preset-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+  .chip {
+    font-family: 'DM Mono', monospace; font-size: 10px; padding: 3px 9px;
+    border-radius: 99px; border: 1px solid var(--border);
+    background: transparent; color: var(--muted); cursor: pointer; transition: all 0.15s;
+  }
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+  .chip.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 600; }
+
+  /* Palettes */
+  .palettes-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+    gap: 5px; margin-bottom: 8px;
+  }
+  .swatch-wrap { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .palette-swatch {
+    width: 100%; aspect-ratio: 3/2; border-radius: 5px; overflow: hidden;
+    cursor: pointer; border: 2px solid transparent;
+    transition: border-color 0.15s, transform 0.1s; position: relative;
+  }
+  .palette-swatch:hover { border-color: var(--accent); transform: scale(1.06); }
+  .swatch-top { height: 65%; }
+  .swatch-bot { height: 35%; display: flex; align-items: center; justify-content: center; font-size: 8px; }
+  .swatch-del {
+    position: absolute; top: 2px; right: 2px; width: 14px; height: 14px;
+    background: rgba(0,0,0,0.7); border: none; border-radius: 3px; color: #fff;
+    font-size: 8px; cursor: pointer; display: none;
+    align-items: center; justify-content: center; padding: 0; line-height: 1;
+  }
+  .palette-swatch:hover .swatch-del { display: flex; }
+  .palette-name { font-size: 9px; color: var(--muted); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+  .save-row { display: flex; gap: 6px; align-items: center; }
+  .save-row input { flex: 1; font-size: 11px; padding: 5px 8px; }
+
+  /* ── SLIDE LIST ── */
+  .slide-list { display: flex; flex-direction: column; gap: 4px; }
+
+  .slide-thumb {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 7px;
+    padding: 0; cursor: pointer; display: flex; align-items: stretch;
+    transition: border-color 0.15s; font-size: 12px; overflow: hidden;
+  }
+  .slide-thumb:hover { border-color: var(--accent); }
+  .slide-thumb.active { border-color: var(--accent); }
+
+  .slide-color-bar { width: 5px; flex-shrink: 0; }
+  .slide-thumb-inner {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 10px; flex: 1; min-width: 0;
+  }
+  .slide-num { font-size: 10px; color: var(--muted); min-width: 16px; }
+  .slide-label { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .slide-color-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.15); }
+
+  /* Slide colour editor panel */
+  .slide-color-editor {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px; margin-top: 8px; display: none;
+  }
+  .slide-color-editor.open { display: block; }
+  .slide-color-editor .sec-label {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 1px;
+    color: var(--muted); margin-bottom: 8px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  /* Resistor colour bar */
+  .resistor-bar {
+    display: flex; border-radius: 6px; overflow: hidden;
+    height: 28px; margin-bottom: 8px; border: 1px solid var(--border);
+  }
+  .resistor-band {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 600; cursor: pointer;
+    transition: opacity 0.15s; position: relative;
+  }
+  .resistor-band:hover { opacity: 0.85; }
+  .resistor-band.active-band::after {
+    content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 0; height: 0;
+    border-left: 5px solid transparent; border-right: 5px solid transparent;
+    border-bottom: 5px solid var(--accent);
+  }
+
+  /* ── MAIN ── */
+  .main { display: flex; flex-direction: column; overflow: hidden; }
+  .toolbar {
+    padding: 10px 20px; border-bottom: 1px solid var(--border);
+    display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  }
+  .btn {
+    font-family: 'DM Mono', monospace; font-size: 12px; padding: 7px 13px;
+    border-radius: 6px; border: 1px solid var(--border); cursor: pointer;
+    transition: all 0.15s; display: flex; align-items: center; gap: 5px; white-space: nowrap;
+  }
+  .btn-primary { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 500; }
+  .btn-primary:hover { background: #cc1f1f; }
+  .btn-ghost { background: transparent; color: var(--text); }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-resistor {
+    background: linear-gradient(90deg,#000 0%,#8B4500 10%,#c00 20%,#ff6600 30%,#ffff00 40%,#009900 50%,#0000ff 60%,#8b008b 70%,#888 80%,#fff 90%,#c8a96e 100%);
+    color: #fff; border-color: transparent; font-weight: 600;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+  }
+  .btn-resistor:hover { opacity: 0.9; }
+  .btn-resistor.resistor-active { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .nav-btn { width: 30px; height: 30px; padding: 0; font-size: 16px; justify-content: center; }
+  .slide-counter { margin-left: auto; font-size: 11px; color: var(--muted); }
+
+  .preview-area {
+    flex: 1; overflow: hidden; display: flex; align-items: center; justify-content: center; padding: 28px;
+    background: radial-gradient(ellipse at 20% 80%, #1a1a00 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, #0a0a1a 0%, transparent 50%), var(--bg);
+  }
+  .preview-wrapper { position: relative; }
+  .preview-shadow {
+    position: absolute; inset: 20px; background: var(--accent); opacity: 0.07;
+    filter: blur(40px); border-radius: 12px;
+  }
+  .slide-scale-wrap { position: relative; transform-origin: top left; }
+  #slide-canvas { display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+  #slide-text {
+    position: relative; z-index: 2; text-align: center; padding: 80px;
+    word-break: break-word; white-space: pre-wrap; line-height: 1.2;
+  }
+  .empty-state { color: var(--muted); font-size: 14px; text-align: center; }
+
+  .export-progress {
+    display: none; position: fixed; bottom: 20px; right: 20px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 18px; font-size: 12px; z-index: 100; min-width: 200px;
+  }
+  .export-progress.visible { display: block; }
+  .progress-bar { width: 100%; height: 3px; background: var(--border); border-radius: 2px; margin-top: 8px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.3s; width: 0%; }
+
+  .hint { font-size: 10px; color: var(--muted); margin-top: 5px; line-height: 1.5; }
+
+  /* Toggle switch */
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; }
+  .toggle { position: relative; display: inline-block; width: 34px; height: 18px; flex-shrink: 0; }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute; inset: 0; background: var(--border); border-radius: 99px;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .toggle-slider::before {
+    content: ''; position: absolute; width: 12px; height: 12px; border-radius: 50%;
+    background: #fff; left: 3px; top: 3px; transition: transform 0.2s;
+  }
+  .toggle input:checked + .toggle-slider { background: var(--accent); }
+  .toggle input:checked + .toggle-slider::before { transform: translateX(16px); background: #000; }
+
+  /* Border controls */
+  .border-controls { margin-top: 10px; display: none; }
+  .border-controls.open { display: block; }
+
+  /* Slide border overlay — rendered inside the canvas so html2canvas picks it up */
+  #slide-border-overlay {
+    position: absolute; inset: 0; pointer-events: none; z-index: 3;
+    display: none;
+  }
+  #slide-border-overlay.visible { display: block; }
+
+  /* Corner slash SVG overlay */
+  #slide-slash-svg {
+    position: absolute; inset: 0; pointer-events: none; z-index: 4;
+    width: 100%; height: 100%; display: none;
+  }
+  #slide-slash-svg.visible { display: block; }
+
+  /* Corner picker buttons */
+  .corner-picker {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 8px;
+  }
+  .corner-btn {
+    font-family: 'DM Mono', monospace; font-size: 11px;
+    padding: 5px 4px; border-radius: 5px; border: 1px solid var(--border);
+    background: transparent; color: var(--muted); cursor: pointer;
+    transition: all 0.15s; text-align: center;
+  }
+  .corner-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .corner-btn.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Slide<span>Export</span></h1>
+  <span class=&quot;badge&quot;>PNG</span>
+  <span class=&quot;badge&quot; id=&quot;size-badge&quot;>1920 × 1080</span>
+</header>
+
+<!-- SIDEBAR -->
+<div class=&quot;sidebar&quot;>
+
+  <!-- TEXT -->
+  <div class=&quot;section&quot;>
+    <div class=&quot;section-title&quot;>Slide Text</div>
+    <textarea id=&quot;text-input&quot; placeholder=&quot;P1&amp;#10;BACKGROUND&amp;#10;TIMER&amp;#10;VT 2&quot; rows=&quot;5&quot;></textarea>
+    <p class=&quot;hint&quot;>One line = one slide.</p>
+    <div class=&quot;row r2&quot; style=&quot;margin-top:8px;&quot;>
+      <button class=&quot;btn btn-primary&quot; onclick=&quot;generateSlides()&quot;>▶ Generate</button>
+      <button class=&quot;btn btn-ghost&quot; onclick=&quot;clearAll()&quot;>✕ Clear</button>
+    </div>
+  </div>
+
+  <!-- SIZE -->
+  <div class=&quot;section&quot;>
+    <div class=&quot;section-title&quot;>Slide Size</div>
+    <div class=&quot;preset-chips&quot;>
+      <button class=&quot;chip active&quot; onclick=&quot;applyPreset(1920,1080,this)&quot;>1920×1080</button>
+      <button class=&quot;chip&quot; onclick=&quot;applyPreset(1280,720,this)&quot;>1280×720</button>
+      <button class=&quot;chip&quot; onclick=&quot;applyPreset(3840,2160,this)&quot;>4K</button>
+      <button class=&quot;chip&quot; onclick=&quot;applyPreset(1080,1080,this)&quot;>Square</button>
+      <button class=&quot;chip&quot; onclick=&quot;applyPreset(1080,1920,this)&quot;>Portrait</button>
+    </div>
+    <div class=&quot;row r3&quot;>
+      <div class=&quot;field&quot;><label>Width</label><input type=&quot;number&quot; id=&quot;slide-w&quot; value=&quot;1920&quot; min=&quot;100&quot; max=&quot;7680&quot; onchange=&quot;onSizeChange()&quot;></div>
+      <div class=&quot;field&quot;><label>Height</label><input type=&quot;number&quot; id=&quot;slide-h&quot; value=&quot;1080&quot; min=&quot;100&quot; max=&quot;4320&quot; onchange=&quot;onSizeChange()&quot;></div>
+      <div class=&quot;field&quot;><label>Unit</label>
+        <select id=&quot;size-unit&quot; onchange=&quot;onUnitChange()&quot;>
+          <option value=&quot;px&quot; selected>px</option>
+          <option value=&quot;in&quot;>in</option>
+          <option value=&quot;cm&quot;>cm</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- TYPOGRAPHY -->
+  <div class=&quot;section&quot;>
+    <div class=&quot;section-title&quot;>Typography</div>
+    <div class=&quot;row&quot; style=&quot;gap:8px;&quot;>
+      <div class=&quot;row r2&quot;>
+        <div class=&quot;field&quot;><label>Font Size (px)</label><input type=&quot;number&quot; id=&quot;font-size&quot; value=&quot;180&quot; min=&quot;10&quot; max=&quot;800&quot; onchange=&quot;updatePreview()&quot;></div>
+        <div class=&quot;field&quot;><label>Weight</label>
+          <select id=&quot;font-weight&quot; onchange=&quot;updatePreview()&quot;>
+            <option value=&quot;400&quot;>Regular</option>
+            <option value=&quot;600&quot;>Semi Bold</option>
+            <option value=&quot;700&quot; selected>Bold</option>
+            <option value=&quot;800&quot;>Extra Bold</option>
+          </select>
+        </div>
+      </div>
+      <div class=&quot;field&quot;><label>Font Family</label>
+        <select id=&quot;font-family&quot; onchange=&quot;updatePreview()&quot;>
+          <option value=&quot;'Syne', sans-serif&quot;>Syne</option>
+          <option value=&quot;'DM Mono', monospace&quot;>DM Mono</option>
+          <option value=&quot;Georgia, serif&quot;>Georgia</option>
+          <option value=&quot;Arial, sans-serif&quot;>Arial</option>
+          <option value=&quot;'Courier New', monospace&quot;>Courier New</option>
+          <option value=&quot;Impact, sans-serif&quot;>Impact</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- GLOBAL COLOURS -->
+  <div class=&quot;section&quot;>
+    <div class=&quot;section-title&quot;>
+      Default Colours
+      <span style=&quot;font-size:9px;text-transform:none;letter-spacing:0;color:var(--muted);&quot;>applied when no per-slide override</span>
+    </div>
+    <div class=&quot;row r2&quot; style=&quot;gap:8px;&quot;>
+      <div class=&quot;field&quot;><label>Background</label>
+        <div class=&quot;color-wrap&quot;>
+          <input type=&quot;color&quot; id=&quot;bg-color&quot; value=&quot;#8B4500&quot; oninput=&quot;syncColor('bg')&quot; onchange=&quot;updatePreview()&quot;>
+          <input class=&quot;hex-input&quot; id=&quot;bg-hex&quot; value=&quot;#8B4500&quot; maxlength=&quot;7&quot; oninput=&quot;syncHex('bg')&quot; onchange=&quot;updatePreview()&quot;>
+        </div>
+      </div>
+      <div class=&quot;field&quot;><label>Text</label>
+        <div class=&quot;color-wrap&quot;>
+          <input type=&quot;color&quot; id=&quot;text-color&quot; value=&quot;#ffffff&quot; oninput=&quot;syncColor('text')&quot; onchange=&quot;updatePreview()&quot;>
+          <input class=&quot;hex-input&quot; id=&quot;text-hex&quot; value=&quot;#ffffff&quot; maxlength=&quot;7&quot; oninput=&quot;syncHex('text')&quot; onchange=&quot;updatePreview()&quot;>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BORDER -->
+  <div class=&quot;section&quot;>
+    <div class=&quot;section-title&quot;>
+      Border
+    </div>
+    <div class=&quot;toggle-row&quot; style=&quot;margin-bottom:2px;&quot;>
+      <span style=&quot;font-size:11px;color:var(--text);&quot;>Enable border</span>
+      <label class=&quot;toggle&quot;>
+        <input type=&quot;checkbox&quot; id=&quot;border-enabled&quot; onchange=&quot;onBorderChange()&quot;>
+        <span class=&quot;toggle-slider&quot;></span>
+      </label>
+    </div>
+    <div class=&quot;border-controls&quot; id=&quot;border-controls&quot;>
+      <div class=&quot;row r3&quot; style=&quot;margin-top:10px;gap:8px;&quot;>
+        <div class=&quot;field&quot; style=&quot;grid-column:span 1;&quot;>
+          <label>Width (px)</label>
+          <input type=&quot;number&quot; id=&quot;border-width&quot; value=&quot;20&quot; min=&quot;1&quot; max=&quot;500&quot; onchange=&quot;onBorderChange()&quot;>
+        </div>
+        <div class=&quot;field&quot; style=&quot;grid-column:span 2;&quot;>
+          <label>Colour</label>
+          <div class=&quot;color-wrap&quot;>
+            <input type=&quot;color&quot; id=&quot;border-color&quot; value=&quot;#ffffff&quot; oninput=&quot;syncBorderColor()&quot; onchange=&quot;onBorderChange()&quot;>
+            <input class=&quot;hex-input&quot; id=&quot;border-hex&quot; value=&quot;#ffffff&quot; maxlength=&quot;7&quot; oninput=&quot;syncBorderHex()&quot; onchange=&quot;onBorderChange()&quot;>
+          </div>
+        </div>
+      </div>
+      <div class=&quot;field&quot; style=&quot;margin-top:8px;&quot;>
+        <label>Style</label>
+        <select id=&quot;border-style&quot; onchange=&quot;onBorderChange()&quot;>
+          <option value=&quot;solid&quot; selected>Solid</option>
+          <option value=&quot;dashed&quot;>Dashed</option>
+          <option value=&quot;dotted&quot;>Dotted</option>
+          <option value=&quot;double&quot;>Double</option>
+          <option value=&quot;groove&quot;>Groove</option>
+          <option value=&quot;ridge&quot;>Ridge</option>
+        </select>
+      </div>
+      <div class=&quot;field&quot; style=&quot;margin-top:8px;&quot;>
+        <label>Position</label>
+        <select id=&quot;border-position&quot; onchange=&quot;onBorderChange()&quot;>
+          <option value=&quot;inset&quot; selected>Inset (inside slide)</option>
+          <option value=&quot;center&quot;>Centered on edge</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- SAVED PALETTES -->
+  <div class=&quot;section&quot;>
+    <div class=&quot;section-title&quot;>
+      Saved Palettes
+      <span style=&quot;font-size:9px;text-transform:none;letter-spacing:0;&quot;>hover → delete</span>
+    </div>
+    <div class=&quot;palettes-grid&quot; id=&quot;palettes-grid&quot;></div>
+    <div class=&quot;save-row&quot;>
+      <input type=&quot;text&quot; id=&quot;palette-name&quot; placeholder=&quot;Palette name…&quot; maxlength=&quot;20&quot;>
+      <button class=&quot;btn btn-ghost&quot; style=&quot;padding:5px 10px;font-size:11px;flex-shrink:0;&quot; onclick=&quot;savePalette()&quot;>＋ Save</button>
+    </div>
+  </div>
+
+  <!-- SLIDE LIST -->
+  <div class=&quot;section&quot; style=&quot;flex:1;min-height:100px;&quot;>
+    <div class=&quot;section-title&quot;>
+      Slides
+      <span style=&quot;font-size:9px;text-transform:none;letter-spacing:0;&quot;>click to select &amp;amp; edit colours</span>
+    </div>
+    <div class=&quot;slide-list&quot; id=&quot;slide-list&quot;></div>
+
+    <!-- Per-slide colour editor -->
+    <div class=&quot;slide-color-editor&quot; id=&quot;slide-color-editor&quot;>
+      <div class=&quot;sec-label&quot;>
+        <span id=&quot;editor-slide-label&quot;>Slide 1 colours</span>
+        <button class=&quot;btn btn-ghost&quot; style=&quot;padding:2px 7px;font-size:10px;&quot; onclick=&quot;closeEditor()&quot;>✕</button>
+      </div>
+
+      <!-- Resistor colour code bar -->
+      <div style=&quot;margin-bottom:6px;&quot;>
+        <div style=&quot;font-size:10px;color:var(--muted);margin-bottom:5px;display:flex;align-items:center;justify-content:space-between;&quot;>
+          <span>Resistor Colour Code</span>
+          <span style=&quot;font-size:9px;&quot; id=&quot;resistor-digit-label&quot;>Slide #1 → digit 0</span>
+        </div>
+        <div class=&quot;resistor-bar&quot; id=&quot;resistor-bar&quot;></div>
+        <p class=&quot;hint&quot; style=&quot;margin-top:4px;&quot;>Click a band to apply it to this slide.</p>
+      </div>
+
+      <div class=&quot;row r2&quot; style=&quot;gap:8px;margin-top:10px;&quot;>
+        <div class=&quot;field&quot;><label>BG Colour</label>
+          <div class=&quot;color-wrap&quot;>
+            <input type=&quot;color&quot; id=&quot;slide-bg-color&quot; value=&quot;#8B4500&quot; oninput=&quot;syncSlideColor('bg')&quot; onchange=&quot;applySlideColor()&quot;>
+            <input class=&quot;hex-input&quot; id=&quot;slide-bg-hex&quot; value=&quot;#8B4500&quot; maxlength=&quot;7&quot; oninput=&quot;syncSlideHex('bg')&quot; onchange=&quot;applySlideColor()&quot;>
+          </div>
+        </div>
+        <div class=&quot;field&quot;><label>Text Colour</label>
+          <div class=&quot;color-wrap&quot;>
+            <input type=&quot;color&quot; id=&quot;slide-text-color&quot; value=&quot;#ffffff&quot; oninput=&quot;syncSlideColor('text')&quot; onchange=&quot;applySlideColor()&quot;>
+            <input class=&quot;hex-input&quot; id=&quot;slide-text-hex&quot; value=&quot;#ffffff&quot; maxlength=&quot;7&quot; oninput=&quot;syncSlideHex('text')&quot; onchange=&quot;applySlideColor()&quot;>
+          </div>
+        </div>
+      </div>
+      <div class=&quot;row r2&quot; style=&quot;gap:8px;margin-top:8px;&quot;>
+        <button class=&quot;btn btn-ghost&quot; style=&quot;font-size:11px;padding:5px;&quot; onclick=&quot;applyPaletteToSlide()&quot;>← Use default colours</button>
+        <button class=&quot;btn btn-ghost&quot; style=&quot;font-size:11px;padding:5px;color:#ef4444;border-color:#ef4444;&quot; onclick=&quot;clearSlideColor()&quot;>✕ Clear override</button>
+      </div>
+
+      <!-- Corner slash -->
+      <div style=&quot;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);&quot;>
+        <div class=&quot;toggle-row&quot; style=&quot;margin-bottom:6px;&quot;>
+          <span style=&quot;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);&quot;>Corner Slash</span>
+          <label class=&quot;toggle&quot;>
+            <input type=&quot;checkbox&quot; id=&quot;slash-enabled&quot; onchange=&quot;onSlashChange()&quot;>
+            <span class=&quot;toggle-slider&quot;></span>
+          </label>
+        </div>
+        <div id=&quot;slash-controls&quot; style=&quot;display:none;&quot;>
+          <div style=&quot;font-size:10px;color:var(--muted);margin-bottom:5px;&quot;>Corner</div>
+          <div class=&quot;corner-picker&quot;>
+            <button class=&quot;corner-btn active&quot; id=&quot;corner-tl&quot; onclick=&quot;setCorner('tl',this)&quot;>↖ Top Left</button>
+            <button class=&quot;corner-btn&quot; id=&quot;corner-tr&quot; onclick=&quot;setCorner('tr',this)&quot;>↗ Top Right</button>
+            <button class=&quot;corner-btn&quot; id=&quot;corner-bl&quot; onclick=&quot;setCorner('bl',this)&quot;>↙ Bot Left</button>
+            <button class=&quot;corner-btn&quot; id=&quot;corner-br&quot; onclick=&quot;setCorner('br',this)&quot;>↘ Bot Right</button>
+          </div>
+          <div class=&quot;row r2&quot; style=&quot;gap:8px;margin-top:6px;&quot;>
+            <div class=&quot;field&quot;>
+              <label>Size (px)</label>
+              <input type=&quot;number&quot; id=&quot;slash-size&quot; value=&quot;300&quot; min=&quot;20&quot; max=&quot;2000&quot; onchange=&quot;onSlashChange()&quot;>
+            </div>
+            <div class=&quot;field&quot;>
+              <label>Colour</label>
+              <div class=&quot;color-wrap&quot;>
+                <input type=&quot;color&quot; id=&quot;slash-color&quot; value=&quot;#000000&quot; oninput=&quot;syncSlashColor()&quot; onchange=&quot;onSlashChange()&quot;>
+                <input class=&quot;hex-input&quot; id=&quot;slash-hex&quot; value=&quot;#000000&quot; maxlength=&quot;7&quot; oninput=&quot;syncSlashHex()&quot; onchange=&quot;onSlashChange()&quot;>
+              </div>
+            </div>
+          </div>
+          <button class=&quot;btn btn-ghost&quot; style=&quot;font-size:11px;padding:5px;width:100%;margin-top:6px;color:#ef4444;border-color:#ef4444;&quot; onclick=&quot;clearSlash()&quot;>✕ Remove slash</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MAIN -->
+<div class=&quot;main&quot;>
+  <div class=&quot;toolbar&quot;>
+    <div style=&quot;display:flex;gap:3px;&quot;>
+      <button class=&quot;btn btn-ghost nav-btn&quot; onclick=&quot;navigate(-1)&quot;>‹</button>
+      <button class=&quot;btn btn-ghost nav-btn&quot; onclick=&quot;navigate(1)&quot;>›</button>
+    </div>
+    <button class=&quot;btn btn-resistor&quot; id=&quot;resistor-all-btn&quot; onclick=&quot;applyResistorAll()&quot; title=&quot;Auto-assign resistor colour codes to all slides by slide number&quot;>⚡ Resistor Auto</button>
+    <button class=&quot;btn btn-ghost&quot; onclick=&quot;exportCurrent()&quot;>⬇ Export Current</button>
+    <button class=&quot;btn btn-primary&quot; onclick=&quot;exportAll()&quot;>⬇ Export All as ZIP</button>
+    <span class=&quot;slide-counter&quot; id=&quot;slide-counter&quot;>No slides</span>
+  </div>
+
+  <div class=&quot;preview-area&quot; id=&quot;preview-area&quot;>
+    <div id=&quot;preview-wrapper&quot; class=&quot;preview-wrapper&quot; style=&quot;display:none;&quot;>
+      <div class=&quot;preview-shadow&quot;></div>
+      <div class=&quot;slide-scale-wrap&quot; id=&quot;scale-wrap&quot;>
+        <div id=&quot;slide-canvas&quot;>
+          <div id=&quot;slide-text&quot;></div>
+          <div id=&quot;slide-border-overlay&quot;></div>
+          <svg id=&quot;slide-slash-svg&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot; preserveAspectRatio=&quot;none&quot;>
+            <polygon id=&quot;slash-polygon&quot; points=&quot;0,0 0,0 0,0&quot; fill=&quot;#000000&quot;/>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <div id=&quot;empty-state&quot; class=&quot;empty-state&quot;>
+      <p style=&quot;font-size:28px;margin-bottom:10px;&quot;>📋</p>
+      <p>Enter text and click Generate</p>
+    </div>
+  </div>
+</div>
+
+<div class=&quot;export-progress&quot; id=&quot;export-progress&quot;>
+  <div id=&quot;export-status&quot;>Exporting…</div>
+  <div class=&quot;progress-bar&quot;><div class=&quot;progress-fill&quot; id=&quot;progress-fill&quot;></div></div>
+</div>
+
+<script>
+// ── BORDER ─────────────────────────────────────────────────────────
+function getBorderConfig() {
+  return {
+    enabled:  document.getElementById('border-enabled').checked,
+    width:    parseInt(document.getElementById('border-width').value)  || 20,
+    color:    document.getElementById('border-color').value,
+    style:    document.getElementById('border-style').value,
+    position: document.getElementById('border-position').value,
+  };
+}
+
+function onBorderChange() {
+  const enabled = document.getElementById('border-enabled').checked;
+  document.getElementById('border-controls').classList.toggle('open', enabled);
+  syncBorderColor();
+  applyBorderToCanvas();
+}
+
+function syncBorderColor() {
+  document.getElementById('border-hex').value = document.getElementById('border-color').value;
+}
+function syncBorderHex() {
+  const v = document.getElementById('border-hex').value;
+  if (/^#[0-9a-fA-F]{6}$/.test(v)) document.getElementById('border-color').value = v;
+}
+
+function applyBorderToCanvas() {
+  const overlay = document.getElementById('slide-border-overlay');
+  const cfg = getBorderConfig();
+  if (!cfg.enabled) {
+    overlay.classList.remove('visible');
+    overlay.style.cssText = '';
+    return;
+  }
+  overlay.classList.add('visible');
+
+  // We use an absolutely-positioned inset div so html2canvas captures it.
+  // For 'inset' position: border draws inside the slide bounds (no overflow).
+  // For 'center': border straddles the edge — we clip overflow on the canvas.
+  const half = Math.round(cfg.width / 2);
+  if (cfg.position === 'inset') {
+    overlay.style.cssText = `
+      position:absolute; z-index:3; pointer-events:none; display:block;
+      top:0; left:0; right:0; bottom:0;
+      border: ${cfg.width}px ${cfg.style} ${cfg.color};
+      box-sizing: border-box;
+    `;
+  } else {
+    // center — inset by half so the border straddles the edge; canvas overflow:hidden clips the outer half
+    overlay.style.cssText = `
+      position:absolute; z-index:3; pointer-events:none; display:block;
+      top:${-half}px; left:${-half}px; right:${-half}px; bottom:${-half}px;
+      border: ${cfg.width}px ${cfg.style} ${cfg.color};
+      box-sizing: border-box;
+    `;
+  }
+}
+
+// ── RESISTOR COLOUR CODE ────────────────────────────────────────────
+// digit 0–9 → { name, bg, text }
+const RESISTOR = [
+  { name: 'Black',  bg: '#000000', text: '#ffffff' },
+  { name: 'Brown',  bg: '#8B4500', text: '#ffffff' },
+  { name: 'Red',    bg: '#cc0000', text: '#ffffff' },
+  { name: 'Orange', bg: '#ff6600', text: '#ffffff' },
+  { name: 'Yellow', bg: '#ffff00', text: '#000000' },
+  { name: 'Green',  bg: '#009900', text: '#ffffff' },
+  { name: 'Blue',   bg: '#0000cc', text: '#ffffff' },
+  { name: 'Violet', bg: '#8b008b', text: '#ffffff' },
+  { name: 'Grey',   bg: '#888888', text: '#ffffff' },
+  { name: 'White',  bg: '#ffffff', text: '#000000' },
+];
+
+// ── STATE ──────────────────────────────────────────────────────────
+let slides      = [];       // array of strings (text)
+let slideColors = [];       // array of { bg, text } | null  (per-slide override)
+let slideSlashes = [];      // array of { enabled, corner, size, color } | null
+let currentIndex = 0;
+let slideW = 1920, slideH = 1080;
+const PPI = 96, PPCM = PPI / 2.54;
+
+let palettes = [
+  { name: 'Brown',  bg: '#8B4500', text: '#ffffff' },
+  { name: 'Purple', bg: '#7B2D8B', text: '#ffffff' },
+  { name: 'Navy',   bg: '#0D2167', text: '#ffffff' },
+  { name: 'Sky',    bg: '#00AEEF', text: '#ffffff' },
+  { name: 'Green',  bg: '#8DC63F', text: '#ffffff' },
+  { name: 'Yellow', bg: '#ffff00', text: '#000000' },
+  { name: 'Orange', bg: '#F7941D', text: '#ffffff' },
+  { name: 'Red',    bg: '#ff0000', text: '#ffffff' },
+];
+
+// ── HELPERS ────────────────────────────────────────────────────────
+function getSlideColor(i) {
+  // Returns effective { bg, text } for slide i
+  if (slideColors[i]) return slideColors[i];
+  return {
+    bg:   document.getElementById('bg-color').value,
+    text: document.getElementById('text-color').value,
+  };
+}
+
+// ── GENERATE ───────────────────────────────────────────────────────
+function generateSlides() {
+  const lines = document.getElementById('text-input').value
+    .split('\n').map(l => l.trim()).filter(l => l.length);
+  if (!lines.length) { alert('Enter at least one line.'); return; }
+
+  // Preserve existing per-slide overrides where possible
+  const oldColors   = slideColors.slice();
+  const oldSlashes  = slideSlashes.slice();
+  slides       = lines;
+  slideColors  = lines.map((_, i) => oldColors[i]  || null);
+  slideSlashes = lines.map((_, i) => oldSlashes[i] || null);
+  currentIndex = 0;
+  renderSlideList();
+  updatePreview();
+}
+
+function clearAll() {
+  slides = []; slideColors = []; slideSlashes = []; currentIndex = 0;
+  document.getElementById('text-input').value = '';
+  document.getElementById('slide-list').innerHTML = '';
+  closeEditor();
+  updatePreview();
+}
+
+// ── RESISTOR AUTO-ASSIGN ───────────────────────────────────────────
+function applyResistorAll() {
+  if (!slides.length) { alert('Generate slides first.'); return; }
+  slides.forEach((_, i) => {
+    const digit = i % 10; // cycle through 0–9
+    slideColors[i] = { bg: RESISTOR[digit].bg, text: RESISTOR[digit].text };
+  });
+  renderSlideList();
+  updatePreview();
+  // Flash the button
+  const btn = document.getElementById('resistor-all-btn');
+  btn.classList.add('resistor-active');
+  setTimeout(() => btn.classList.remove('resistor-active'), 1200);
+}
+
+// ── SLIDE LIST ─────────────────────────────────────────────────────
+function renderSlideList() {
+  const list = document.getElementById('slide-list');
+  list.innerHTML = '';
+  slides.forEach((text, i) => {
+    const col = getSlideColor(i);
+    const hasOverride = !!slideColors[i];
+    const hasSlash    = !!(slideSlashes[i] &amp;&amp; slideSlashes[i].enabled);
+
+    const el = document.createElement('div');
+    el.className = 'slide-thumb' + (i === currentIndex ? ' active' : '');
+    el.innerHTML = `
+      <div class=&quot;slide-color-bar&quot; style=&quot;background:${col.bg};&quot;></div>
+      <div class=&quot;slide-thumb-inner&quot;>
+        <span class=&quot;slide-num&quot;>${String(i+1).padStart(2,'0')}</span>
+        <span class=&quot;slide-label&quot;>${text}</span>
+        ${hasSlash ? `<span style=&quot;font-size:10px;opacity:0.7;&quot; title=&quot;Has corner slash&quot;>◤</span>` : ''}
+        <span class=&quot;slide-color-dot&quot; style=&quot;background:${col.bg};${hasOverride ? 'outline:2px solid var(--accent);outline-offset:1px;' : ''}&quot; title=&quot;${hasOverride ? 'Custom colour' : 'Default colour'}&quot;></span>
+      </div>`;
+    el.onclick = () => { currentIndex = i; renderSlideList(); updatePreview(); openEditor(i); };
+    list.appendChild(el);
+  });
+}
+
+// ── PER-SLIDE EDITOR ───────────────────────────────────────────────
+function openEditor(i) {
+  const editor = document.getElementById('slide-color-editor');
+  editor.classList.add('open');
+
+  document.getElementById('editor-slide-label').textContent = `Slide ${i+1} colours`;
+
+  const col = getSlideColor(i);
+  document.getElementById('slide-bg-color').value   = col.bg;
+  document.getElementById('slide-bg-hex').value     = col.bg;
+  document.getElementById('slide-text-color').value = col.text;
+  document.getElementById('slide-text-hex').value   = col.text;
+
+  // Resistor bar
+  renderResistorBar(i);
+
+  // Slash state
+  const slash = slideSlashes[i];
+  const slashEnabled = !!(slash &amp;&amp; slash.enabled);
+  document.getElementById('slash-enabled').checked = slashEnabled;
+  document.getElementById('slash-controls').style.display = slashEnabled ? 'block' : 'none';
+  if (slash) {
+    setActiveCornerBtn(slash.corner || 'tl');
+    document.getElementById('slash-size').value  = slash.size  || 300;
+    document.getElementById('slash-color').value = slash.color || '#000000';
+    document.getElementById('slash-hex').value   = slash.color || '#000000';
+  } else {
+    setActiveCornerBtn('tl');
+    document.getElementById('slash-size').value  = 300;
+    document.getElementById('slash-color').value = '#000000';
+    document.getElementById('slash-hex').value   = '#000000';
+  }
+}
+
+function closeEditor() {
+  document.getElementById('slide-color-editor').classList.remove('open');
+}
+
+function renderResistorBar(slideIdx) {
+  const bar = document.getElementById('resistor-bar');
+  const digit = slideIdx % 10;
+  document.getElementById('resistor-digit-label').textContent =
+    `Slide #${slideIdx+1} → band ${digit} (${RESISTOR[digit].name})`;
+
+  bar.innerHTML = '';
+  RESISTOR.forEach((r, d) => {
+    const band = document.createElement('div');
+    band.className = 'resistor-band' + (d === digit ? ' active-band' : '');
+    band.style.background = r.bg;
+    band.style.color = r.text;
+    band.title = `${d}: ${r.name}`;
+    band.textContent = d;
+    band.onclick = () => applyResistorBand(slideIdx, d);
+    bar.appendChild(band);
+  });
+}
+
+function applyResistorBand(slideIdx, digit) {
+  const r = RESISTOR[digit];
+  slideColors[slideIdx] = { bg: r.bg, text: r.text };
+  // Update editor pickers
+  document.getElementById('slide-bg-color').value   = r.bg;
+  document.getElementById('slide-bg-hex').value     = r.bg;
+  document.getElementById('slide-text-color').value = r.text;
+  document.getElementById('slide-text-hex').value   = r.text;
+  renderResistorBar(slideIdx);
+  renderSlideList();
+  updatePreview();
+}
+
+function syncSlideColor(type) {
+  const v = document.getElementById(type === 'bg' ? 'slide-bg-color' : 'slide-text-color').value;
+  document.getElementById(type === 'bg' ? 'slide-bg-hex' : 'slide-text-hex').value = v;
+}
+function syncSlideHex(type) {
+  const v = document.getElementById(type === 'bg' ? 'slide-bg-hex' : 'slide-text-hex').value;
+  if (/^#[0-9a-fA-F]{6}$/.test(v))
+    document.getElementById(type === 'bg' ? 'slide-bg-color' : 'slide-text-color').value = v;
+}
+function applySlideColor() {
+  const bg   = document.getElementById('slide-bg-color').value;
+  const text = document.getElementById('slide-text-color').value;
+  slideColors[currentIndex] = { bg, text };
+  renderSlideList();
+  updatePreview();
+}
+function clearSlideColor() {
+  slideColors[currentIndex] = null;
+  const col = getSlideColor(currentIndex);
+  document.getElementById('slide-bg-color').value   = col.bg;
+  document.getElementById('slide-bg-hex').value     = col.bg;
+  document.getElementById('slide-text-color').value = col.text;
+  document.getElementById('slide-text-hex').value   = col.text;
+  renderSlideList();
+  updatePreview();
+}
+function applyPaletteToSlide() {
+  const bg   = document.getElementById('bg-color').value;
+  const text = document.getElementById('text-color').value;
+  slideColors[currentIndex] = { bg, text };
+  document.getElementById('slide-bg-color').value   = bg;
+  document.getElementById('slide-bg-hex').value     = bg;
+  document.getElementById('slide-text-color').value = text;
+  document.getElementById('slide-text-hex').value   = text;
+  renderSlideList();
+  updatePreview();
+}
+
+// ── CORNER SLASH ───────────────────────────────────────────────────
+function getSlashConfig(i) {
+  return slideSlashes[i] || { enabled: false, corner: 'tl', size: 300, color: '#000000' };
+}
+
+function onSlashChange() {
+  const enabled = document.getElementById('slash-enabled').checked;
+  document.getElementById('slash-controls').style.display = enabled ? 'block' : 'none';
+  const corner = getActiveCorner();
+  const size   = parseInt(document.getElementById('slash-size').value) || 300;
+  const color  = document.getElementById('slash-color').value;
+  slideSlashes[currentIndex] = { enabled, corner, size, color };
+  renderSlideList();
+  applySlashToCanvas(currentIndex);
+}
+
+function setCorner(corner, btn) {
+  setActiveCornerBtn(corner);
+  onSlashChange();
+}
+
+function setActiveCornerBtn(corner) {
+  ['tl','tr','bl','br'].forEach(c => {
+    document.getElementById('corner-' + c).classList.toggle('active', c === corner);
+  });
+}
+
+function getActiveCorner() {
+  for (const c of ['tl','tr','bl','br']) {
+    if (document.getElementById('corner-' + c).classList.contains('active')) return c;
+  }
+  return 'tl';
+}
+
+function syncSlashColor() {
+  document.getElementById('slash-hex').value = document.getElementById('slash-color').value;
+}
+function syncSlashHex() {
+  const v = document.getElementById('slash-hex').value;
+  if (/^#[0-9a-fA-F]{6}$/.test(v)) document.getElementById('slash-color').value = v;
+}
+
+function clearSlash() {
+  slideSlashes[currentIndex] = { enabled: false, corner: 'tl', size: 300, color: '#000000' };
+  document.getElementById('slash-enabled').checked = false;
+  document.getElementById('slash-controls').style.display = 'none';
+  setActiveCornerBtn('tl');
+  document.getElementById('slash-size').value  = 300;
+  document.getElementById('slash-color').value = '#000000';
+  document.getElementById('slash-hex').value   = '#000000';
+  renderSlideList();
+  applySlashToCanvas(currentIndex);
+}
+
+// Renders the SVG slash triangle onto the live canvas for slide `idx`
+function applySlashToCanvas(idx) {
+  const svg  = document.getElementById('slide-slash-svg');
+  const poly = document.getElementById('slash-polygon');
+  const cfg  = getSlashConfig(idx);
+
+  if (!cfg.enabled) {
+    svg.classList.remove('visible');
+    return;
+  }
+
+  svg.classList.add('visible');
+  poly.setAttribute('fill', cfg.color);
+
+  // Build triangle points based on corner &amp; size (in slide-pixel coords)
+  const s = cfg.size;
+  const W = slideW, H = slideH;
+  let pts;
+  switch (cfg.corner) {
+    case 'tl': pts = `0,0 ${s},0 0,${s}`;           break;
+    case 'tr': pts = `${W},0 ${W-s},0 ${W},${s}`;   break;
+    case 'bl': pts = `0,${H} ${s},${H} 0,${H-s}`;   break;
+    case 'br': pts = `${W},${H} ${W-s},${H} ${W},${H-s}`; break;
+    default:   pts = `0,0 ${s},0 0,${s}`;
+  }
+  poly.setAttribute('points', pts);
+
+  // SVG viewBox must match slide dimensions so it scales with the canvas
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+}
+
+// ── PREVIEW ────────────────────────────────────────────────────────
+function updatePreview() {
+  const canvas  = document.getElementById('slide-canvas');
+  const textEl  = document.getElementById('slide-text');
+  const counter = document.getElementById('slide-counter');
+  const wrapper = document.getElementById('preview-wrapper');
+  const empty   = document.getElementById('empty-state');
+
+  if (!slides.length) {
+    wrapper.style.display = 'none'; empty.style.display = 'block';
+    counter.textContent = 'No slides'; return;
+  }
+
+  wrapper.style.display = 'block'; empty.style.display = 'none';
+
+  const col = getSlideColor(currentIndex);
+  const fs  = document.getElementById('font-size').value;
+  const fw  = document.getElementById('font-weight').value;
+  const ff  = document.getElementById('font-family').value;
+
+  canvas.style.width      = slideW + 'px';
+  canvas.style.height     = slideH + 'px';
+  canvas.style.background = col.bg;
+  textEl.style.color      = col.text;
+  textEl.style.fontSize   = fs + 'px';
+  textEl.style.fontWeight = fw;
+  textEl.style.fontFamily = ff;
+  textEl.textContent      = slides[currentIndex] || '';
+
+  counter.textContent = `Slide ${currentIndex + 1} of ${slides.length}`;
+  scaleCanvas();
+  applyBorderToCanvas();
+  applySlashToCanvas(currentIndex);
+}
+
+function scaleCanvas() {
+  const area  = document.getElementById('preview-area');
+  const wrap  = document.getElementById('scale-wrap');
+  const pwrap = document.getElementById('preview-wrapper');
+  const scale = Math.min((area.clientWidth-56)/slideW, (area.clientHeight-56)/slideH, 1);
+  wrap.style.transform = `scale(${scale})`;
+  wrap.style.width     = slideW + 'px';
+  wrap.style.height    = slideH + 'px';
+  pwrap.style.width    = (slideW * scale) + 'px';
+  pwrap.style.height   = (slideH * scale) + 'px';
+}
+window.addEventListener('resize', scaleCanvas);
+
+// ── SIZE ───────────────────────────────────────────────────────────
+function onSizeChange() {
+  const unit = document.getElementById('size-unit').value;
+  let w = parseFloat(document.getElementById('slide-w').value) || 1920;
+  let h = parseFloat(document.getElementById('slide-h').value) || 1080;
+  if (unit === 'in') { w *= PPI;  h *= PPI; }
+  if (unit === 'cm') { w *= PPCM; h *= PPCM; }
+  slideW = Math.max(100, Math.min(Math.round(w), 7680));
+  slideH = Math.max(100, Math.min(Math.round(h), 4320));
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  updateSizeBadge(); updatePreview();
+}
+function onUnitChange() {
+  const unit = document.getElementById('size-unit').value;
+  const wEl = document.getElementById('slide-w'), hEl = document.getElementById('slide-h');
+  if (unit === 'px')  { wEl.value = slideW; hEl.value = slideH; wEl.step = hEl.step = 1; }
+  if (unit === 'in')  { wEl.value = (slideW/PPI).toFixed(2); hEl.value = (slideH/PPI).toFixed(2); wEl.step = hEl.step = 0.01; }
+  if (unit === 'cm')  { wEl.value = (slideW/PPCM).toFixed(2); hEl.value = (slideH/PPCM).toFixed(2); wEl.step = hEl.step = 0.01; }
+}
+function applyPreset(w, h, btn) {
+  slideW = w; slideH = h;
+  document.getElementById('size-unit').value = 'px';
+  document.getElementById('slide-w').value = w; document.getElementById('slide-w').step = 1;
+  document.getElementById('slide-h').value = h; document.getElementById('slide-h').step = 1;
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  updateSizeBadge(); updatePreview();
+}
+function updateSizeBadge() {
+  document.getElementById('size-badge').textContent = `${slideW} × ${slideH}`;
+}
+
+// ── PALETTES ───────────────────────────────────────────────────────
+function renderPalettes() {
+  const grid = document.getElementById('palettes-grid');
+  grid.innerHTML = '';
+  palettes.forEach((p, i) => {
+    const wrap   = document.createElement('div'); wrap.className = 'swatch-wrap';
+    const swatch = document.createElement('div'); swatch.className = 'palette-swatch'; swatch.title = p.name;
+    swatch.innerHTML = `
+      <div class=&quot;swatch-top&quot; style=&quot;background:${p.bg};&quot;></div>
+      <div class=&quot;swatch-bot&quot; style=&quot;background:${p.bg};color:${p.text};font-family:'DM Mono',monospace;&quot;>Aa</div>
+      <button class=&quot;swatch-del&quot; onclick=&quot;deletePalette(${i},event)&quot;>✕</button>`;
+    swatch.onclick = () => applyPalette(i);
+    const lbl = document.createElement('div'); lbl.className = 'palette-name'; lbl.textContent = p.name;
+    wrap.appendChild(swatch); wrap.appendChild(lbl); grid.appendChild(wrap);
+  });
+}
+function applyPalette(i) {
+  const p = palettes[i];
+  document.getElementById('bg-color').value   = p.bg;
+  document.getElementById('bg-hex').value     = p.bg;
+  document.getElementById('text-color').value = p.text;
+  document.getElementById('text-hex').value   = p.text;
+  renderSlideList(); updatePreview();
+}
+function savePalette() {
+  const el = document.getElementById('palette-name');
+  const name = el.value.trim() || 'Palette ' + (palettes.length + 1);
+  palettes.push({ name, bg: document.getElementById('bg-color').value, text: document.getElementById('text-color').value });
+  el.value = '';
+  renderPalettes(); persist();
+}
+function deletePalette(i, e) { e.stopPropagation(); palettes.splice(i,1); renderPalettes(); persist(); }
+function persist() { try { localStorage.setItem('slideExporterPalettes', JSON.stringify(palettes)); } catch(e) {} }
+function loadFromStorage() { try { const s = localStorage.getItem('slideExporterPalettes'); if (s) palettes = JSON.parse(s); } catch(e) {} }
+
+// ── GLOBAL COLOUR SYNC ─────────────────────────────────────────────
+function syncColor(type) {
+  document.getElementById(type==='bg'?'bg-hex':'text-hex').value =
+    document.getElementById(type==='bg'?'bg-color':'text-color').value;
+}
+function syncHex(type) {
+  const v = document.getElementById(type==='bg'?'bg-hex':'text-hex').value;
+  if (/^#[0-9a-fA-F]{6}$/.test(v))
+    document.getElementById(type==='bg'?'bg-color':'text-color').value = v;
+}
+
+// ── NAV ────────────────────────────────────────────────────────────
+function navigate(dir) {
+  if (!slides.length) return;
+  currentIndex = (currentIndex + dir + slides.length) % slides.length;
+  renderSlideList(); updatePreview(); openEditor(currentIndex);
+}
+
+// ── EXPORT ─────────────────────────────────────────────────────────
+async function captureSlide(index) {
+  const canvas  = document.getElementById('slide-canvas');
+  const textEl  = document.getElementById('slide-text');
+  const scaleEl = document.getElementById('scale-wrap');
+
+  const col = getSlideColor(index);
+  const fs  = document.getElementById('font-size').value;
+  const fw  = document.getElementById('font-weight').value;
+  const ff  = document.getElementById('font-family').value;
+
+  canvas.style.width      = slideW + 'px';
+  canvas.style.height     = slideH + 'px';
+  canvas.style.background = col.bg;
+  textEl.style.color      = col.text;
+  textEl.style.fontSize   = fs + 'px';
+  textEl.style.fontWeight = fw;
+  textEl.style.fontFamily = ff;
+  textEl.textContent      = slides[index];
+
+  // Apply border and slash overlays for export
+  applyBorderToCanvas();
+  applySlashToCanvas(index);
+
+  await document.fonts.ready;
+  await new Promise(r => setTimeout(r, 150));
+
+  const old = scaleEl.style.transform;
+  scaleEl.style.transform = 'scale(1)';
+
+  const result = await html2canvas(canvas, {
+    width: slideW, height: slideH, scale: 1,
+    useCORS: true, allowTaint: true, backgroundColor: col.bg, logging: false,
+  });
+
+  scaleEl.style.transform = old;
+  return result; // returns HTMLCanvasElement
+}
+
+// Convert canvas to Blob (Promise)
+function canvasToBlob(canvas) {
+  return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+}
+
+// Reliable single-file download via Blob URL
+function dlBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a   = document.createElement('a');
+  a.href     = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 2000);
+}
+
+async function exportCurrent() {
+  if (!slides.length) { alert('Generate slides first.'); return; }
+  setProgress(true, 'Rendering slide…', 0);
+  try {
+    const rendered  = await captureSlide(currentIndex);
+    const blob      = await canvasToBlob(rendered);
+    const filename  = `slide_${pad(currentIndex+1)}_${safe(slides[currentIndex])}.png`;
+    dlBlob(blob, filename);
+    setProgress(true, '✓ Downloaded!', 100);
+  } catch(e) {
+    setProgress(true, '✗ Export failed: ' + e.message, 0);
+  }
+  setTimeout(() => { setProgress(false); updatePreview(); }, 2500);
+}
+
+async function exportAll() {
+  if (!slides.length) { alert('Generate slides first.'); return; }
+
+  setProgress(true, 'Building ZIP…', 0);
+
+  const zip = new JSZip();
+  const folder = zip.folder('slides');
+
+  try {
+    for (let i = 0; i < slides.length; i++) {
+      setProgress(true, `Rendering slide ${i+1} of ${slides.length}…`, Math.round((i / slides.length) * 85));
+      const rendered = await captureSlide(i);
+      const blob     = await canvasToBlob(rendered);
+      const filename = `slide_${pad(i+1)}_${safe(slides[i])}.png`;
+      folder.file(filename, blob);
+      await new Promise(r => setTimeout(r, 80)); // breathe between renders
+    }
+
+    setProgress(true, 'Compressing ZIP…', 88);
+    const zipBlob = await zip.generateAsync(
+      { type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 3 } },
+      meta => setProgress(true, `Compressing… ${meta.percent.toFixed(0)}%`, 88 + Math.round(meta.percent * 0.12))
+    );
+
+    const zipName = `slides_${slides.length}_export.zip`;
+    dlBlob(zipBlob, zipName);
+    setProgress(true, `✓ Downloaded ${slides.length} slide${slides.length > 1 ? 's' : ''} as ${zipName}`, 100);
+
+  } catch(e) {
+    setProgress(true, '✗ Export failed: ' + e.message, 0);
+    console.error(e);
+  }
+
+  setTimeout(() => { setProgress(false); updatePreview(); }, 3500);
+}
+
+function setProgress(visible, message, pct) {
+  const prog   = document.getElementById('export-progress');
+  const fill   = document.getElementById('progress-fill');
+  const status = document.getElementById('export-status');
+  prog.classList.toggle('visible', visible);
+  if (message !== undefined) status.textContent = message;
+  if (pct     !== undefined) fill.style.width   = pct + '%';
+}
+
+function pad(n)  { return String(n).padStart(2, '0'); }
+function safe(s) { return s.replace(/[^a-z0-9]/gi, '_').substring(0, 40); }
+
+// ── INIT ───────────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  loadFromStorage();
+  renderPalettes();
+  updateSizeBadge();
+  scaleCanvas();
+  updatePreview();
+});
+</script>
+</body>
+</html>" sandbox="allow-scripts allow-same-origin allow-downloads allow-modals"></iframe>
+</div>
+
+<script>
+  function showPanel(name) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+    document.querySelector('[data-panel="' + name + '"]').classList.add('active');
+  }
+</script>
+</body>
+</html>
