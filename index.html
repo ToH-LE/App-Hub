@@ -115,6 +115,9 @@
   <button class="nav-tab" data-panel="lightengine" onclick="showPanel('lightengine')">
     Test Pattern
   </button>
+  <button class="nav-tab" data-panel="lens" onclick="showPanel('lens')">
+    Lens Calc
+  </button>
   <button class="nav-tab" data-panel="slides" onclick="showPanel('slides')">
     Slide Export
   </button>
@@ -1161,6 +1164,1200 @@
 </body>
 </html>
 "></iframe>
+</div>
+
+<div class="panel" id="panel-lens">
+  <iframe srcdoc="<!DOCTYPE html>
+<html lang=&quot;en&quot;>
+<head>
+<meta charset=&quot;UTF-8&quot;>
+<meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;>
+<title>Projector Lens Calculator</title>
+<link href=&quot;https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&amp;family=DM+Sans:wght@300;400;500;600&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
+<style>
+
+  :root {
+    --bg: #0a0c0f;
+    --surface: #111318;
+    --panel: #161a20;
+    --border: #252b35;
+    --accent: #ff3333;
+    --accent2: #aaaaaa;
+    --text: #d4dbe8;
+    --muted: #5a6478;
+    --mono: 'Share Tech Mono', monospace;
+    --sans: 'Barlow Condensed', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid overlay background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,51,51,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,51,51,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 28px 24px 48px;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--text); }
+  .topbar-sub { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 1px; }
+  .accent { color: var(--accent); }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  @media (max-width: 560px) {
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 24px;
+  }
+
+  .panel-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .field {
+    margin-bottom: 14px;
+  }
+
+  label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 0;
+  }
+
+  input[type=&quot;number&quot;], select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 1rem;
+    padding: 8px 12px;
+    outline: none;
+    transition: border-color 0.15s;
+    border-radius: 3px 0 0 3px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  input[type=&quot;number&quot;]:focus, select:focus {
+    border-color: var(--accent);
+  }
+
+  .unit-select {
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-left: none;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    padding: 8px 10px;
+    outline: none;
+    cursor: pointer;
+    border-radius: 0 3px 3px 0;
+    min-width: 54px;
+  }
+
+  .unit-select:focus { border-color: var(--accent); }
+
+  select option { background: var(--surface); }
+
+  .full-select {
+    width: 100%;
+    border-radius: 3px;
+  }
+
+  .radio-group {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .radio-group input { display: none; }
+
+  .radio-group label {
+    flex: 1;
+    text-align: center;
+    padding: 8px 4px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    background: var(--surface);
+    color: var(--muted);
+    margin: 0;
+    border-right: 1px solid var(--border);
+    transition: all 0.15s;
+  }
+
+  .radio-group label:last-of-type { border-right: none; }
+
+  .radio-group input:checked + label {
+    background: var(--accent);
+    color: #fff;
+    font-weight: 700;
+  }
+
+  .calc-btn {
+    width: 100%;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    font-family: var(--sans);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 14px;
+    cursor: pointer;
+    border-radius: 3px;
+    margin-top: 8px;
+    transition: background 0.15s, transform 0.1s;
+  }
+
+  .calc-btn:hover { background: #cc1f1f; }
+  .calc-btn:active { transform: scale(0.98); }
+
+  .results {
+    margin-top: 20px;
+    display: none;
+  }
+
+  .results.show { display: block; }
+
+  .result-hero {
+    background: linear-gradient(135deg, #1a0a0a 0%, #131313 100%);
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    padding: 24px;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .result-hero::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 150px; height: 150px;
+    background: radial-gradient(circle, rgba(255,51,51,0.10) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .result-hero-label {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .result-hero-value {
+    font-family: var(--mono);
+    font-size: 2.8rem;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .result-hero-value span {
+    font-size: 1.1rem;
+    color: var(--muted);
+    margin-left: 6px;
+  }
+
+  .result-hero-sub {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  .result-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  @media (max-width: 560px) {
+    .result-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  .result-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 14px;
+  }
+
+  .result-card-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  .result-card-value {
+    font-family: var(--mono);
+    font-size: 1.1rem;
+    color: var(--text);
+  }
+
+  .result-card-value.highlight { color: var(--accent); }
+
+  .lens-rec {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent2);
+    border-radius: 4px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+  }
+
+  .lens-rec-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  .lens-rec-detail {
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .diagram-wrap {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 20px;
+    margin-top: 16px;
+  }
+
+  .diagram-wrap svg { width: 100%; height: auto; }
+
+  .warn {
+    background: #1a1210;
+    border: 1px solid #5a2a10;
+    border-left: 3px solid #e87a4a;
+    border-radius: 4px;
+    padding: 12px 16px;
+    font-size: 0.82rem;
+    color: #c8806a;
+    margin-top: 10px;
+  }
+
+  /* Brand selector */
+  .brand-toggle-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 4px;
+  }
+
+  .brand-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: var(--surface);
+    color: var(--muted);
+    transition: all 0.15s;
+    user-select: none;
+  }
+
+  .brand-chip input { display: none; }
+
+  .brand-chip.barco.active  { border-color: #e84a6a; color: #e84a6a; background: #1a1015; }
+  .brand-chip.panasonic.active { border-color: #4a9ae8; color: #4a9ae8; background: #101520; }
+  .brand-chip.nec.active    { border-color: #4ae890; color: #4ae890; background: #101a14; }
+  .brand-chip.epson.active  { border-color: #e8a44a; color: #e8a44a; background: #1a1508; }
+  .brand-chip.christie.active { border-color: #b04ae8; color: #b04ae8; background: #160e1a; }
+
+  .brand-chip .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.6;
+  }
+
+  /* Brand lens table */
+  .brand-section {
+    margin-bottom: 16px;
+  }
+
+  .brand-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    border-radius: 4px 4px 0 0;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .brand-header.barco   { background: #1a1015; border: 1px solid #5a2040; color: #e84a6a; }
+  .brand-header.panasonic { background: #101520; border: 1px solid #203050; color: #4a9ae8; }
+  .brand-header.nec     { background: #101a14; border: 1px solid #205030; color: #4ae890; }
+  .brand-header.epson   { background: #1a1508; border: 1px solid #503a10; color: #e8a44a; }
+  .brand-header.christie { background: #160e1a; border: 1px solid #3a1050; color: #b04ae8; }
+
+  .lens-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+  }
+
+  .lens-table th {
+    background: var(--surface);
+    color: var(--muted);
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    font-family: var(--sans);
+    font-weight: 600;
+  }
+
+  .lens-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    vertical-align: middle;
+  }
+
+  .lens-table tr:last-child td { border-bottom: none; }
+
+  .lens-table tr.match td { background: rgba(255,51,51,0.06); }
+  .lens-table tr.best-match td { background: rgba(255,51,51,0.13); }
+
+  .lens-table tr.match td:first-child,
+  .lens-table tr.best-match td:first-child {
+    border-left: 3px solid var(--accent2);
+  }
+
+  .match-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    font-size: 0.6rem;
+    font-family: var(--sans);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-radius: 2px;
+    margin-left: 6px;
+  }
+
+  .match-badge.best { background: var(--accent); color: #fff; }
+  .match-badge.ok   { background: var(--border); color: var(--muted); }
+
+  .part-num { color: var(--muted); font-size: 0.72rem; }
+
+  .brand-section-wrap {
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    overflow: hidden;
+  }
+
+  .section-title {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin: 20px 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+
+
+
+
+
+</style>
+</head>
+<body>
+<div class=&quot;wrapper&quot;>
+  <header>
+    <span class=&quot;topbar-title&quot;>Projector Lens Calc</span>
+    <span class=&quot;topbar-sub&quot;>— Throw ratio · Focal length · Lens recommendations</span>
+  </header>
+
+
+
+  <div class=&quot;grid-2&quot;>
+    <!-- Screen Setup -->
+    <div class=&quot;panel&quot;>
+      <div class=&quot;panel-label&quot;>Screen Setup</div>
+
+      <div class=&quot;field&quot;>
+        <label>Screen Width</label>
+        <div class=&quot;input-row&quot;>
+          <input type=&quot;number&quot; id=&quot;screenW&quot; value=&quot;3&quot; min=&quot;0.1&quot; step=&quot;0.1&quot;>
+          <select class=&quot;unit-select&quot; id=&quot;screenWUnit&quot;>
+            <option value=&quot;m&quot;>m</option>
+            <option value=&quot;ft&quot;>ft</option>
+            <option value=&quot;cm&quot;>cm</option>
+            <option value=&quot;in&quot;>in</option>
+          </select>
+        </div>
+      </div>
+
+      <div class=&quot;field&quot;>
+        <label>Screen Height</label>
+        <div class=&quot;input-row&quot;>
+          <input type=&quot;number&quot; id=&quot;screenH&quot; value=&quot;1.69&quot; min=&quot;0.1&quot; step=&quot;0.1&quot;>
+          <select class=&quot;unit-select&quot; id=&quot;screenHUnit&quot;>
+            <option value=&quot;m&quot;>m</option>
+            <option value=&quot;ft&quot;>ft</option>
+            <option value=&quot;cm&quot;>cm</option>
+            <option value=&quot;in&quot;>in</option>
+          </select>
+        </div>
+      </div>
+
+      <div class=&quot;field&quot;>
+        <label>— or enter diagonal + ratio —</label>
+      </div>
+
+      <div class=&quot;field&quot;>
+        <label>Screen Diagonal (optional)</label>
+        <div class=&quot;input-row&quot;>
+          <input type=&quot;number&quot; id=&quot;screenDiag&quot; placeholder=&quot;e.g. 120&quot; min=&quot;1&quot; step=&quot;1&quot;>
+          <select class=&quot;unit-select&quot; id=&quot;screenDiagUnit&quot;>
+            <option value=&quot;in&quot;>in</option>
+            <option value=&quot;cm&quot;>cm</option>
+            <option value=&quot;m&quot;>m</option>
+          </select>
+        </div>
+      </div>
+
+      <div class=&quot;field&quot;>
+        <label>Aspect Ratio</label>
+        <div class=&quot;radio-group&quot;>
+          <input type=&quot;radio&quot; name=&quot;ar&quot; id=&quot;ar169&quot; value=&quot;16:9&quot; checked>
+          <label for=&quot;ar169&quot;>16:9</label>
+          <input type=&quot;radio&quot; name=&quot;ar&quot; id=&quot;ar43&quot; value=&quot;4:3&quot;>
+          <label for=&quot;ar43&quot;>4:3</label>
+          <input type=&quot;radio&quot; name=&quot;ar&quot; id=&quot;ar219&quot; value=&quot;21:9&quot;>
+          <label for=&quot;ar219&quot;>21:9</label>
+          <input type=&quot;radio&quot; name=&quot;ar&quot; id=&quot;ar11&quot; value=&quot;1:1&quot;>
+          <label for=&quot;ar11&quot;>1:1</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Projector Setup -->
+    <div class=&quot;panel&quot;>
+      <div class=&quot;panel-label&quot;>Projector Setup</div>
+
+      <div class=&quot;field&quot;>
+        <label>Throw Distance</label>
+        <div class=&quot;input-row&quot;>
+          <input type=&quot;number&quot; id=&quot;throwDist&quot; value=&quot;4.5&quot; min=&quot;0.1&quot; step=&quot;0.1&quot;>
+          <select class=&quot;unit-select&quot; id=&quot;throwDistUnit&quot;>
+            <option value=&quot;m&quot;>m</option>
+            <option value=&quot;ft&quot;>ft</option>
+            <option value=&quot;cm&quot;>cm</option>
+            <option value=&quot;in&quot;>in</option>
+          </select>
+        </div>
+      </div>
+
+      <div class=&quot;field&quot;>
+        <label>Projector Chip Size</label>
+        <div style=&quot;position:relative;&quot;>
+          <select id=&quot;chipSize&quot; class=&quot;full-select&quot; style=&quot;border-radius:3px;&quot; onchange=&quot;onChipChange(this)&quot;>
+            <optgroup label=&quot;── Generic / Technology&quot;>
+              <option value=&quot;g_0.67_14.90_3840x2160&quot;>0.67&quot; DMD — 4K UHD (3840×2160)</option>
+              <option value=&quot;g_0.67_14.90_2716x1528&quot;>0.67&quot; DMD — 4K DCI (2716×1528)</option>
+              <option value=&quot;g_0.65_14.41_1920x1200&quot;>0.65&quot; DMD — WUXGA (1920×1200)</option>
+              <option value=&quot;g_0.55_12.19_1920x1200&quot;>0.55&quot; DMD — WUXGA (1920×1200)</option>
+              <option value=&quot;g_0.47_10.45_1920x1080&quot;>0.47&quot; DMD — FHD (1920×1080)</option>
+              <option value=&quot;g_1.0_21.95_1920x1200&quot; selected>1.0&quot; 3LCD — WUXGA (1920×1200)</option>
+              <option value=&quot;g_1.0_21.95_3840x2160&quot;>1.0&quot; 3LCD — 4K UHD (3840×2160)</option>
+              <option value=&quot;g_0.74_16.30_1920x1200&quot;>0.74&quot; 3LCD — WUXGA (1920×1200)</option>
+              <option value=&quot;g_0.61_13.50_1920x1080&quot;>0.61&quot; 3LCD — FHD (1920×1080)</option>
+              <option value=&quot;g_1.27_27.90_3840x2400&quot;>1.27&quot; 3LCD — 4K+ (3840×2400)</option>
+            </optgroup>
+            <optgroup label=&quot;── Barco&quot;>
+              <option value=&quot;b_1.27_27.90_3840x2400&quot;>UDX-4K32 / UDX-4K22 — 1.27&quot; DLP · 4K (3840×2400)</option>
+              <option value=&quot;b_0.96_21.12_1920x1200&quot;>UDX-W26 / UDX-W22 — 0.96&quot; DLP · WUXGA (1920×1200)</option>
+              <option value=&quot;b_0.67_14.90_3840x2160&quot;>F80-4K8 / F80-4K6 — 0.67&quot; DLP · 4K UHD (3840×2160)</option>
+              <option value=&quot;b_0.65_14.41_1920x1200&quot;>G60-W10 / G60-W8 — 0.65&quot; DLP · WUXGA (1920×1200)</option>
+              <option value=&quot;b_0.55_12.19_1920x1200&quot;>G62-W10 / G62-W8 — 0.55&quot; DLP · WUXGA (1920×1200)</option>
+              <option value=&quot;b_1.38_30.48_1920x1200&quot;>HDX-W20 FLEX — 1.38&quot; DLP · WUXGA (1920×1200)</option>
+            </optgroup>
+            <optgroup label=&quot;── Panasonic&quot;>
+              <option value=&quot;p_1.27_27.90_3840x2400&quot;>PT-RZ31K / PT-RZ21K — 1.27&quot; DLP · 4K (3840×2400)</option>
+              <option value=&quot;p_1.0_21.95_3840x2160&quot;>PT-RZ16K / PT-RZ12K — 1.0&quot; DLP · 4K UHD (3840×2160)</option>
+              <option value=&quot;p_0.76_16.73_3840x2400&quot;>PT-RQ35K / PT-RQ22K — 0.76&quot; DLP · 4K+ (3840×2400)</option>
+              <option value=&quot;p_0.67_14.90_1920x1200&quot;>PT-MZ20K / PT-MZ16K — 0.67&quot; DLP · WUXGA (1920×1200)</option>
+              <option value=&quot;p_1.0_21.95_1920x1200_3lcd&quot;>PT-EZ590 / PT-EW650 — 1.0&quot; 3LCD · WUXGA (1920×1200)</option>
+              <option value=&quot;p_0.74_16.30_1920x1200&quot;>PT-VZ580 / PT-VW545 — 0.74&quot; 3LCD · WUXGA (1920×1200)</option>
+            </optgroup>
+            <optgroup label=&quot;── NEC&quot;>
+              <option value=&quot;n_1.27_27.90_3840x2400&quot;>PH3501QL / PH2601QL — 1.27&quot; DLP · 4K (3840×2400)</option>
+              <option value=&quot;n_1.0_21.95_3840x2160&quot;>PA1505UL / PA1004UL — 1.0&quot; DLP · 4K UHD (3840×2160)</option>
+              <option value=&quot;n_0.67_14.90_1920x1200&quot;>PA804UL / PA654UL — 0.67&quot; DLP · WUXGA (1920×1200)</option>
+              <option value=&quot;n_0.65_14.41_1920x1200&quot;>PA703UL / PA653UL — 0.65&quot; DLP · WUXGA (1920×1200)</option>
+              <option value=&quot;n_1.0_21.95_1920x1200_3lcd&quot;>NP-PA903X / PA853W — 1.0&quot; 3LCD · WUXGA (1920×1200)</option>
+              <option value=&quot;n_0.76_16.73_1920x1200&quot;>NP-P605UL — 0.76&quot; DLP · WUXGA (1920×1200)</option>
+            </optgroup>
+            <optgroup label=&quot;── Epson&quot;>
+              <option value=&quot;e_1.0_21.50_1920x1200&quot;>EB-PU2220B / EB-PU2216B — 1.0&quot; 3LCD · WUXGA (1920×1200)</option>
+              <option value=&quot;e_1.0_21.50_1920x1080&quot;>EB-PU2213B / EB-PU2010B — 1.0&quot; 3LCD · FHD (1920×1080)</option>
+              <option value=&quot;e_0.76_16.73_1920x1200&quot;>EB-L1755U / EB-L1750U — 0.76&quot; 3LCD · WUXGA (1920×1200)</option>
+              <option value=&quot;e_0.67_14.70_1920x1200&quot;>EB-L1495U / EB-L1490U — 0.67&quot; 3LCD · WUXGA (1920×1200)</option>
+              <option value=&quot;e_0.61_13.50_1920x1080&quot;>EB-L730U / EB-L720U — 0.61&quot; 3LCD · FHD (1920×1080)</option>
+              <option value=&quot;e_0.59_12.90_1920x1200&quot;>EB-L520U / EB-L510U — 0.59&quot; 3LCD · WUXGA (1920×1200)</option>
+              <option value=&quot;e_0.47_10.45_1280x800&quot;>EB-W70 / EB-X70 — 0.47&quot; 3LCD · WXGA (1280×800)</option>
+            </optgroup>
+            <optgroup label=&quot;── Christie&quot;>
+              <option value=&quot;c_1.38_30.48_1920x1200&quot;>Crimson WU31 / WU25 — 1.38&quot; DLP · WUXGA (1920×1200)</option>
+              <option value=&quot;c_1.27_27.90_4096x2160&quot;>Mirage 304K / 214K — 1.27&quot; DLP · 4K DCI (4096×2160)</option>
+              <option value=&quot;c_1.0_21.95_4096x2160&quot;>D4K40 / D4K35 — 1.0&quot; DLP · 4K DCI (4096×2160)</option>
+              <option value=&quot;c_0.96_21.12_1920x1080&quot;>Crimson HD25 / HD20 — 0.96&quot; DLP · FHD (1920×1080)</option>
+              <option value=&quot;c_0.67_14.90_1920x1200&quot;>DWU960-iS / DWU860-iS — 0.67&quot; DLP · WUXGA (1920×1200)</option>
+              <option value=&quot;c_0.65_14.41_1920x1200&quot;>LWU720i / LWU620i — 0.65&quot; DLP · WUXGA (1920×1200)</option>
+              <option value=&quot;c_0.55_12.19_1920x1200&quot;>DWU599-GS / DWU530-GS — 0.55&quot; DLP · WUXGA (1920×1200)</option>
+            </optgroup>
+            <optgroup label=&quot;── Custom&quot;>
+              <option value=&quot;custom&quot;>Custom chip width...</option>
+            </optgroup>
+          </select>
+        </div>
+        <div id=&quot;chip-info-tag&quot; style=&quot;margin-top:5px;font-family:var(--mono);font-size:0.7rem;color:var(--muted);min-height:1.2em;&quot;></div>
+      </div>
+
+      <div class=&quot;field&quot; id=&quot;customChipField&quot; style=&quot;display:none&quot;>
+        <label>Custom Chip Width (mm)</label>
+        <div class=&quot;input-row&quot;>
+          <input type=&quot;number&quot; id=&quot;customChipW&quot; value=&quot;14.6&quot; step=&quot;0.1&quot; min=&quot;1&quot;>
+          <select class=&quot;unit-select&quot; style=&quot;pointer-events:none;color:var(--muted)&quot;>mm</select>
+        </div>
+        <label style=&quot;margin-top:8px;&quot;>Native Resolution (W × H px)</label>
+        <div class=&quot;input-row&quot; style=&quot;gap:6px;&quot;>
+          <input type=&quot;number&quot; id=&quot;customResW&quot; value=&quot;1920&quot; step=&quot;1&quot; min=&quot;1&quot; style=&quot;border-radius:3px;&quot;>
+          <span style=&quot;color:var(--muted);font-family:var(--mono);padding:8px 4px;flex-shrink:0;&quot;>×</span>
+          <input type=&quot;number&quot; id=&quot;customResH&quot; value=&quot;1080&quot; step=&quot;1&quot; min=&quot;1&quot; style=&quot;border-radius:3px;&quot;>
+        </div>
+      </div>
+
+      <div class=&quot;field&quot;>
+        <label>Lens Offset / Shift</label>
+        <div class=&quot;radio-group&quot;>
+          <input type=&quot;radio&quot; name=&quot;shift&quot; id=&quot;shiftNone&quot; value=&quot;none&quot; checked>
+          <label for=&quot;shiftNone&quot;>None</label>
+          <input type=&quot;radio&quot; name=&quot;shift&quot; id=&quot;shiftStd&quot; value=&quot;standard&quot;>
+          <label for=&quot;shiftStd&quot;>Standard</label>
+          <input type=&quot;radio&quot; name=&quot;shift&quot; id=&quot;shiftLens&quot; value=&quot;lens&quot;>
+          <label for=&quot;shiftLens&quot;>Lens Shift</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Brand selector -->
+  <div class=&quot;panel&quot; style=&quot;margin-top:16px;&quot;>
+    <div class=&quot;panel-label&quot;>Manufacturer Lens Database</div>
+    <div style=&quot;font-size:0.82rem;color:var(--muted);margin-bottom:12px;&quot;>
+      Select brands to show matching lenses from their interchangeable lens catalogue after calculating.
+    </div>
+    <div class=&quot;brand-toggle-row&quot;>
+      <label class=&quot;brand-chip barco&quot; id=&quot;chip-barco&quot;>
+        <input type=&quot;checkbox&quot; id=&quot;brand-barco&quot; onchange=&quot;toggleBrand('barco')&quot;>
+        <span class=&quot;dot&quot;></span> Barco
+      </label>
+      <label class=&quot;brand-chip panasonic&quot; id=&quot;chip-panasonic&quot;>
+        <input type=&quot;checkbox&quot; id=&quot;brand-panasonic&quot; onchange=&quot;toggleBrand('panasonic')&quot;>
+        <span class=&quot;dot&quot;></span> Panasonic
+      </label>
+      <label class=&quot;brand-chip nec&quot; id=&quot;chip-nec&quot;>
+        <input type=&quot;checkbox&quot; id=&quot;brand-nec&quot; onchange=&quot;toggleBrand('nec')&quot;>
+        <span class=&quot;dot&quot;></span> NEC
+      </label>
+      <label class=&quot;brand-chip epson&quot; id=&quot;chip-epson&quot;>
+        <input type=&quot;checkbox&quot; id=&quot;brand-epson&quot; onchange=&quot;toggleBrand('epson')&quot;>
+        <span class=&quot;dot&quot;></span> Epson
+      </label>
+      <label class=&quot;brand-chip christie&quot; id=&quot;chip-christie&quot;>
+        <input type=&quot;checkbox&quot; id=&quot;brand-christie&quot; onchange=&quot;toggleBrand('christie')&quot;>
+        <span class=&quot;dot&quot;></span> Christie
+      </label>
+    </div>
+  </div>
+
+  <button class=&quot;calc-btn&quot; onclick=&quot;calculate()&quot;>CALCULATE LENS REQUIREMENTS</button>
+
+  <!-- Results -->
+  <div class=&quot;results&quot; id=&quot;results&quot;>
+
+    <div class=&quot;section-title&quot;>Results</div>
+
+    <div class=&quot;result-hero&quot;>
+      <div class=&quot;result-hero-label&quot;>Required Throw Ratio</div>
+      <div class=&quot;result-hero-value&quot; id=&quot;res-tr&quot;>—<span>: 1</span></div>
+      <div class=&quot;result-hero-sub&quot; id=&quot;res-tr-desc&quot;>Distance to width ratio</div>
+    </div>
+
+    <div class=&quot;result-grid&quot;>
+      <div class=&quot;result-card&quot;>
+        <div class=&quot;result-card-label&quot;>Throw Distance</div>
+        <div class=&quot;result-card-value&quot; id=&quot;res-dist&quot;>—</div>
+      </div>
+      <div class=&quot;result-card&quot;>
+        <div class=&quot;result-card-label&quot;>Screen Width</div>
+        <div class=&quot;result-card-value&quot; id=&quot;res-sw&quot;>—</div>
+      </div>
+      <div class=&quot;result-card&quot;>
+        <div class=&quot;result-card-label&quot;>Screen Diagonal</div>
+        <div class=&quot;result-card-value&quot; id=&quot;res-diag&quot;>—</div>
+      </div>
+      <div class=&quot;result-card&quot;>
+        <div class=&quot;result-card-label&quot;>Est. Focal Length</div>
+        <div class=&quot;result-card-value highlight&quot; id=&quot;res-fl&quot;>—</div>
+      </div>
+      <div class=&quot;result-card&quot;>
+        <div class=&quot;result-card-label&quot;>F-stop Range</div>
+        <div class=&quot;result-card-value&quot; id=&quot;res-fstop&quot;>—</div>
+      </div>
+      <div class=&quot;result-card&quot;>
+        <div class=&quot;result-card-label&quot;>Category</div>
+        <div class=&quot;result-card-value&quot; id=&quot;res-cat&quot;>—</div>
+      </div>
+    </div>
+
+    <div class=&quot;section-title&quot;>Lens Recommendations</div>
+    <div id=&quot;lens-recs&quot;></div>
+
+    <div id=&quot;brand-lens-section&quot; style=&quot;display:none&quot;>
+      <div class=&quot;section-title&quot;>Manufacturer Lens Matches</div>
+      <div id=&quot;brand-lens-tables&quot;></div>
+    </div>
+
+    <div class=&quot;section-title&quot;>Diagram</div>
+    <div class=&quot;diagram-wrap&quot;>
+      <svg id=&quot;diagram&quot; viewBox=&quot;0 0 600 140&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;></svg>
+    </div>
+
+    <div id=&quot;warn-area&quot;></div>
+
+  </div>
+
+
+</div>
+<script>
+// Unit conversion utility
+function toM(val, unit) {
+  if (!val || isNaN(val)) return 0;
+  switch(unit) {
+    case 'm':  return val;
+    case 'cm': return val / 100;
+    case 'mm': return val / 1000;
+    case 'ft': return val * 0.3048;
+    case 'in': return val * 0.0254;
+    default:   return val;
+  }
+}
+</script>
+<script>
+// ─── Shared utility ───────────────────────────────────────────────────────────
+// (toM defined in blend script above)
+
+// Parse chip option value: &quot;prefix_diagInches_widthMM_WxH&quot; e.g. &quot;b_1.27_27.90_3840x2400&quot;
+function parseChipValue(val) {
+  if (val === 'custom') return null;
+  const parts = val.split('_');
+  const resPart = parts.find(p => /^\d+x\d+$/.test(p));
+  let resW = 0, resH = 0;
+  if (resPart) { [resW, resH] = resPart.split('x').map(Number); }
+  return { diag: parseFloat(parts[1]), w: parseFloat(parts[2]), resW, resH };
+}
+
+function getChipRes() {
+  const val = document.getElementById('chipSize').value;
+  if (val === 'custom') {
+    return {
+      resW: parseInt(document.getElementById('customResW').value) || 1920,
+      resH: parseInt(document.getElementById('customResH').value) || 1080
+    };
+  }
+  const c = parseChipValue(val);
+  return { resW: c.resW, resH: c.resH };
+}
+
+function onChipChange(sel) {
+  const val = sel.value;
+  const isCustom = val === 'custom';
+  document.getElementById('customChipField').style.display = isCustom ? 'block' : 'none';
+  const info = document.getElementById('chip-info-tag');
+  if (isCustom) { info.textContent = ''; return; }
+  const chip = parseChipValue(val);
+  const resStr = chip.resW ? `  ·  native: ${chip.resW}×${chip.resH}` : '';
+  info.textContent = `chip: ${chip.w} mm  |  diag: ${chip.diag}&quot;${resStr}`;
+}
+
+// Run once on load to set info tag for default selection
+onChipChange(document.getElementById('chipSize'));
+
+// Auto-fill W/H from diagonal
+document.getElementById('screenDiag').addEventListener('input', fillFromDiag);
+document.querySelectorAll('input[name=&quot;ar&quot;]').forEach(r => r.addEventListener('change', fillFromDiag));
+
+function fillFromDiag() {
+  const diagVal = parseFloat(document.getElementById('screenDiag').value);
+  if (!diagVal || isNaN(diagVal)) return;
+  const diagM = toM(diagVal, document.getElementById('screenDiagUnit').value);
+  const arStr = document.querySelector('input[name=&quot;ar&quot;]:checked').value;
+  const [aw, ah] = arStr.split(':').map(Number);
+  const ratio = aw / ah;
+  const h = diagM / Math.sqrt(ratio * ratio + 1);
+  const w = h * ratio;
+  document.getElementById('screenW').value = parseFloat(w.toFixed(2));
+  document.getElementById('screenH').value = parseFloat(h.toFixed(2));
+  document.getElementById('screenWUnit').value = 'm';
+  document.getElementById('screenHUnit').value = 'm';
+}
+
+function calculate() {
+  let sw = toM(parseFloat(document.getElementById('screenW').value), document.getElementById('screenWUnit').value);
+  let sh = toM(parseFloat(document.getElementById('screenH').value), document.getElementById('screenHUnit').value);
+  let td = toM(parseFloat(document.getElementById('throwDist').value), document.getElementById('throwDistUnit').value);
+
+  if (!sw || !sh || !td || isNaN(sw) || isNaN(sh) || isNaN(td)) {
+    alert('Please fill in screen width, height, and throw distance.');
+    return;
+  }
+
+  const chipSel = document.getElementById('chipSize').value;
+  let chipW_mm;
+  if (chipSel === 'custom') {
+    chipW_mm = parseFloat(document.getElementById('customChipW').value);
+  } else {
+    chipW_mm = parseChipValue(chipSel).w;
+  }
+
+  const throwRatio = td / sw;
+  const diagM = Math.sqrt(sw*sw + sh*sh);
+  const diagIn = diagM / 0.0254;
+
+  // Focal length estimate: FL = throwRatio * chipWidth
+  // This is the standard approximation used in projector optics
+  const focalLength_mm = throwRatio * chipW_mm;
+
+  // F-stop: typical projector lenses F/1.7 – F/2.8
+  const fMin = (focalLength_mm / (chipW_mm * 0.85)).toFixed(1);
+  const fMax = (focalLength_mm / (chipW_mm * 0.45)).toFixed(1);
+
+  // Classify throw type
+  let category, catColour;
+  if (throwRatio < 0.4) { category = 'Ultra Short Throw (UST)'; catColour = '#e84a9a'; }
+  else if (throwRatio < 0.8) { category = 'Short Throw'; catColour = '#4ae890'; }
+  else if (throwRatio <= 2.0) { category = 'Standard Throw'; catColour = '#aaaaaa'; }
+  else if (throwRatio <= 3.5) { category = 'Long Throw'; catColour = '#ff3333'; }
+  else { category = 'Very Long Throw'; catColour = '#e87a4a'; }
+
+  // Display results
+  document.getElementById('res-tr').innerHTML = `${throwRatio.toFixed(2)}<span>: 1</span>`;
+  document.getElementById('res-tr-desc').textContent = `${td.toFixed(2)} m throw ÷ ${sw.toFixed(2)} m width`;
+  document.getElementById('res-dist').textContent = `${td.toFixed(2)} m`;
+  document.getElementById('res-sw').textContent = `${sw.toFixed(2)} m`;
+  document.getElementById('res-diag').textContent = `${diagIn.toFixed(0)}&quot; (${(diagM*100).toFixed(0)} cm)`;
+  document.getElementById('res-fl').textContent = `${focalLength_mm.toFixed(1)} mm`;
+  document.getElementById('res-fstop').textContent = `f/${fMin} – f/${fMax}`;
+  const catEl = document.getElementById('res-cat');
+  catEl.textContent = category;
+  catEl.style.color = catColour;
+
+  // Lens recommendations
+  const recEl = document.getElementById('lens-recs');
+  recEl.innerHTML = '';
+
+  const recs = getLensRecs(throwRatio, focalLength_mm, chipSel);
+  recs.forEach(r => {
+    recEl.innerHTML += `
+      <div class=&quot;lens-rec&quot;>
+        <div class=&quot;lens-rec-title&quot;>${r.title}</div>
+        <div class=&quot;lens-rec-detail&quot;>${r.detail}</div>
+      </div>`;
+  });
+
+  // Warnings
+  const warnEl = document.getElementById('warn-area');
+  warnEl.innerHTML = '';
+  if (throwRatio < 0.4) {
+    warnEl.innerHTML += `<div class=&quot;warn&quot;>⚠ Ultra-short throw projectors require special UST lenses and precise ceiling/floor mounting. Standard lenses won't work at this distance.</div>`;
+  }
+  if (td < 0.5) {
+    warnEl.innerHTML += `<div class=&quot;warn&quot;>⚠ Throw distance under 0.5 m — very few projectors support this. Consider a large display panel instead.</div>`;
+  }
+  if (throwRatio > 4.5) {
+    warnEl.innerHTML += `<div class=&quot;warn&quot;>⚠ Very high throw ratio. Long-throw lenses can suffer from reduced brightness and keystone. Verify your projector has sufficient ANSI lumens.</div>`;
+  }
+
+  drawDiagram(td, sw, sh);
+  renderBrandTables(throwRatio);
+
+  document.getElementById('results').className = 'results show';
+}
+
+function getLensRecs(tr, fl_mm, chipSel) {
+  const recs = [];
+
+  if (tr < 0.4) {
+    recs.push({
+      title: 'UST Fixed Lens',
+      detail: `Throw ratio ${tr.toFixed(2)}:1 requires an ultra-short throw fixed lens. Look for UST lenses rated 0.2–0.4:1. Examples: Optoma UST, BenQ UST series, Sony VPL-VZ7. These use mirror-assisted or fisheye-type optics and are usually non-interchangeable.`
+    });
+  } else if (tr < 0.8) {
+    recs.push({
+      title: 'Short Throw Zoom Lens',
+      detail: `Estimated focal length ~${fl_mm.toFixed(0)} mm. Short throw zoom lenses in the 0.75–0.8:1 range. Suitable for classrooms or small boardrooms. Look for lenses rated 0.6–0.8:1 throw ratio. EIKI, Barco, Christie, and Panasonic all make ET-short-throw adapters for their platforms.`
+    });
+  } else if (tr <= 2.0) {
+    recs.push({
+      title: 'Standard Zoom Lens (Primary Recommendation)',
+      detail: `Estimated focal length ~${fl_mm.toFixed(0)} mm. This is the most common projector lens range. Most projectors ship with a 1.2:1–2.0:1 standard zoom. Verify your throw ratio falls within your projector's native zoom range — if it does, no additional lens is needed.`
+    });
+    recs.push({
+      title: 'Interchangeable Zoom Lens',
+      detail: `If using a large-venue projector (Barco, Christie, NEC PA series, Panasonic PT-RZ), select a zoom lens covering your throw ratio of ${tr.toFixed(2)}:1. Most manufacturers label lenses by their TR range, e.g. &quot;1.25–1.79:1 zoom lens&quot;.`
+    });
+  } else if (tr <= 3.5) {
+    recs.push({
+      title: 'Long Throw Zoom Lens',
+      detail: `Estimated focal length ~${fl_mm.toFixed(0)} mm. Throw ratio ${tr.toFixed(2)}:1 falls in the long-throw range. Look for lenses rated 2.0–3.5:1. These are common for rear-projection or large venues with long throws. NEC, Epson, and Barco offer long-throw options for their respective mounts.`
+    });
+  } else {
+    recs.push({
+      title: 'Very Long Throw / Tele Lens',
+      detail: `Estimated focal length ~${fl_mm.toFixed(0)} mm. Throw ratio ${tr.toFixed(2)}:1 requires a telephoto lens. These are typically found in specialised large-venue projectors (Christie, Barco, Panasonic ET-ELT). Expect reduced flux (brightness) with very long throw lenses — account for this in your lumen budget.`
+    });
+  }
+
+  const chipLabel = chipSel === 'custom' ? 'custom'
+    : (() => { const c = parseChipValue(chipSel); return `${c.diag}&quot;`; })();
+  recs.push({
+    title: 'Verification Tip',
+    detail: `Always cross-check with your projector manufacturer's official throw distance calculator. Each projector model has a specific throw ratio range for each lens. The estimated focal length of ~${fl_mm.toFixed(0)} mm is derived from throw ratio × chip width (${chipLabel} chip).`
+  });
+
+  return recs;
+}
+
+// ─── Brand chip toggle ───────────────────────────────────────────────────────
+function toggleBrand(brand) {
+  const cb = document.getElementById('brand-' + brand);
+  const chip = document.getElementById('chip-' + brand);
+  chip.classList.toggle('active', cb.checked);
+}
+
+// ─── Lens databases ──────────────────────────────────────────────────────────
+// throw_min / throw_max = throw ratio range (distance / image width)
+// All part numbers are standard interchangeable lens SKUs for large-venue lines
+
+const LENS_DB = {
+  barco: {
+    name: 'Barco',
+    color: '#e84a6a',
+    note: 'Compatible with Barco UDX, UDM, F80, G60 series (TLD+ mount). Always verify mount compatibility for your specific projector model.',
+    lenses: [
+      { part: 'R9801265',  name: 'TLD+ 0.36–0.56:1 UST Zoom',    tr_min: 0.36, tr_max: 0.56, type: 'Short Throw Zoom',   fl: '11–17 mm' },
+      { part: 'R9801264',  name: 'TLD+ 0.67:1 Short Throw Fixed', tr_min: 0.67, tr_max: 0.67, type: 'Fixed Short Throw',  fl: '~14 mm' },
+      { part: 'R9801263',  name: 'TLD+ 0.8–1.16:1 Short Zoom',   tr_min: 0.80, tr_max: 1.16, type: 'Short Zoom',         fl: '17–24 mm' },
+      { part: 'R9801262',  name: 'TLD+ 1.16–1.49:1 Zoom',        tr_min: 1.16, tr_max: 1.49, type: 'Standard Zoom',      fl: '24–31 mm' },
+      { part: 'R9801261',  name: 'TLD+ 1.45–1.8:1 Zoom',         tr_min: 1.45, tr_max: 1.80, type: 'Standard Zoom',      fl: '30–38 mm' },
+      { part: 'R9801260',  name: 'TLD+ 1.76–2.35:1 Zoom',        tr_min: 1.76, tr_max: 2.35, type: 'Standard Zoom',      fl: '37–49 mm' },
+      { part: 'R9801259',  name: 'TLD+ 2.27–3.58:1 Zoom',        tr_min: 2.27, tr_max: 3.58, type: 'Long Throw Zoom',    fl: '48–75 mm' },
+      { part: 'R9801258',  name: 'TLD+ 3.58–5.38:1 Zoom',        tr_min: 3.58, tr_max: 5.38, type: 'Long Throw Zoom',    fl: '75–113 mm' },
+      { part: 'R9801257',  name: 'TLD+ 5.0–8.0:1 Zoom',          tr_min: 5.00, tr_max: 8.00, type: 'Tele Zoom',          fl: '105–168 mm' },
+    ]
+  },
+  panasonic: {
+    name: 'Panasonic',
+    color: '#4a9ae8',
+    note: 'ET-series lenses for PT-RZ/RQ/MZ series (bayonet mount). Some lenses require ET-PKR100H/S rigging bracket. Confirm series compatibility before ordering.',
+    lenses: [
+      { part: 'ET-DLE030',  name: 'DLE030 0.29:1 UST Fixed',     tr_min: 0.29, tr_max: 0.29, type: 'UST Fixed',           fl: '~8.8 mm' },
+      { part: 'ET-DLE055',  name: 'DLE055 0.55:1 Short Fixed',   tr_min: 0.55, tr_max: 0.55, type: 'Short Fixed',         fl: '~11 mm' },
+      { part: 'ET-DLE085',  name: 'DLE085 0.8–1.0:1 Short Zoom', tr_min: 0.80, tr_max: 1.00, type: 'Short Throw Zoom',   fl: '17–21 mm' },
+      { part: 'ET-DLE105',  name: 'DLE105 1.0–1.25:1 Zoom',      tr_min: 1.00, tr_max: 1.25, type: 'Standard Zoom',      fl: '21–26 mm' },
+      { part: 'ET-DLE150',  name: 'DLE150 1.25–1.78:1 Zoom',     tr_min: 1.25, tr_max: 1.78, type: 'Standard Zoom',      fl: '26–37 mm' },
+      { part: 'ET-DLE250',  name: 'DLE250 1.78–2.41:1 Zoom',     tr_min: 1.78, tr_max: 2.41, type: 'Standard Zoom',      fl: '37–51 mm' },
+      { part: 'ET-DLE350',  name: 'DLE350 2.41–4.60:1 Zoom',     tr_min: 2.41, tr_max: 4.60, type: 'Long Throw Zoom',    fl: '51–97 mm' },
+      { part: 'ET-DLE450',  name: 'DLE450 4.58–7.17:1 Zoom',     tr_min: 4.58, tr_max: 7.17, type: 'Tele Zoom',          fl: '97–151 mm' },
+      { part: 'ET-DLE650',  name: 'DLE650 6.93–10.7:1 Zoom',     tr_min: 6.93, tr_max: 10.7, type: 'Super Tele',         fl: '146–225 mm' },
+    ]
+  },
+  nec: {
+    name: 'NEC',
+    color: '#4ae890',
+    note: 'NP-series lenses for NEC PA series (PA903X, PA1004UL, PA1505UL etc.) and PH series. Mount type varies — verify NP mount vs bayonet before purchasing.',
+    lenses: [
+      { part: 'NP13ZL',  name: 'NP13ZL 0.76–0.95:1 Short Zoom', tr_min: 0.76, tr_max: 0.95, type: 'Short Throw Zoom',  fl: '16–20 mm' },
+      { part: 'NP14ZL',  name: 'NP14ZL 0.95–1.22:1 Zoom',       tr_min: 0.95, tr_max: 1.22, type: 'Standard Zoom',     fl: '20–25 mm' },
+      { part: 'NP15ZL',  name: 'NP15ZL 1.22–1.53:1 Zoom',       tr_min: 1.22, tr_max: 1.53, type: 'Standard Zoom',     fl: '25–32 mm' },
+      { part: 'NP16ZL',  name: 'NP16ZL 1.53–2.05:1 Zoom',       tr_min: 1.53, tr_max: 2.05, type: 'Standard Zoom',     fl: '32–43 mm' },
+      { part: 'NP17ZL',  name: 'NP17ZL 1.73–2.27:1 Zoom',       tr_min: 1.73, tr_max: 2.27, type: 'Standard Zoom',     fl: '36–48 mm' },
+      { part: 'NP18ZL',  name: 'NP18ZL 2.22–4.43:1 Long Zoom',  tr_min: 2.22, tr_max: 4.43, type: 'Long Throw Zoom',   fl: '47–93 mm' },
+      { part: 'NP19ZL',  name: 'NP19ZL 3.58–5.38:1 Long Zoom',  tr_min: 3.58, tr_max: 5.38, type: 'Long Throw Zoom',   fl: '75–113 mm' },
+      { part: 'NP20ZL',  name: 'NP20ZL 5.27–8.07:1 Tele Zoom',  tr_min: 5.27, tr_max: 8.07, type: 'Tele Zoom',         fl: '111–169 mm' },
+      { part: 'NP21ZL',  name: 'NP21ZL 7.87–10.5:1 Tele Zoom',  tr_min: 7.87, tr_max: 10.5, type: 'Super Tele',        fl: '165–220 mm' },
+      { part: 'NP39ML',  name: 'NP39ML 0.38:1 UST Fixed',       tr_min: 0.38, tr_max: 0.38, type: 'UST Fixed',          fl: '~8 mm' },
+    ]
+  },
+  epson: {
+    name: 'Epson',
+    color: '#e8a44a',
+    note: 'ELPLX / ELPLU / ELPLR / ELPLW / ELPLM / ELPLL lenses for EB-PU2000 / EB-L1000 series (bayonet mount). Lens shift range varies by model — check Epson\'s lens compatibility chart before ordering.',
+    lenses: [
+      { part: 'ELPLX02S',  name: 'ELPLX02S 0.25:1 UST Fixed',         tr_min: 0.25, tr_max: 0.25, type: 'UST Fixed',          fl: '~5.4 mm' },
+      { part: 'ELPLX02WS', name: 'ELPLX02WS 0.25:1 UST Fixed (Wide)', tr_min: 0.25, tr_max: 0.25, type: 'UST Fixed Wide',     fl: '~5.4 mm' },
+      { part: 'ELPLU04',   name: 'ELPLU04 0.35–0.46:1 ST Zoom',       tr_min: 0.35, tr_max: 0.46, type: 'Short Throw Zoom',   fl: '~7.6–10 mm' },
+      { part: 'ELPLU03S',  name: 'ELPLU03S 0.46–0.57:1 ST Zoom',      tr_min: 0.46, tr_max: 0.57, type: 'Short Throw Zoom',   fl: '~10–12 mm' },
+      { part: 'ELPLW06',   name: 'ELPLW06 0.79–1.01:1 Wide Zoom',     tr_min: 0.79, tr_max: 1.01, type: 'Wide Zoom',          fl: '~17–22 mm' },
+      { part: 'ELPLW08',   name: 'ELPLW08 0.99–1.29:1 Wide Zoom',     tr_min: 0.99, tr_max: 1.29, type: 'Wide Zoom',          fl: '~21–28 mm' },
+      { part: 'ELPLM15',   name: 'ELPLM15 1.30–1.62:1 Mid Zoom',      tr_min: 1.30, tr_max: 1.62, type: 'Standard Zoom',      fl: '~28–35 mm' },
+      { part: 'ELPLM10',   name: 'ELPLM10 1.58–2.05:1 Mid Zoom',      tr_min: 1.58, tr_max: 2.05, type: 'Standard Zoom',      fl: '~34–44 mm' },
+      { part: 'ELPLM11',   name: 'ELPLM11 1.98–3.24:1 Mid-Long Zoom', tr_min: 1.98, tr_max: 3.24, type: 'Long Throw Zoom',    fl: '~43–70 mm' },
+      { part: 'ELPLL08',   name: 'ELPLL08 3.18–5.35:1 Long Zoom',     tr_min: 3.18, tr_max: 5.35, type: 'Long Throw Zoom',    fl: '~68–115 mm' },
+      { part: 'ELPLL07',   name: 'ELPLL07 5.30–8.00:1 Tele Zoom',     tr_min: 5.30, tr_max: 8.00, type: 'Tele Zoom',          fl: '~114–172 mm' },
+    ]
+  },
+  christie: {
+    name: 'Christie',
+    color: '#b04ae8',
+    note: 'Christie lenses use the proprietary Twist-and-Lock (TL) bayonet mount shared across Crimson, D4K, Mirage, and DWU/LWU series. Verify mount generation (TL vs TL+) for your specific chassis before ordering.',
+    lenses: [
+      { part: '140-113106-01', name: '0.38:1 UST Fixed',              tr_min: 0.38, tr_max: 0.38, type: 'UST Fixed',          fl: '~8 mm' },
+      { part: '140-113105-01', name: '0.65:1 Short Fixed',            tr_min: 0.65, tr_max: 0.65, type: 'Short Fixed',        fl: '~14 mm' },
+      { part: '140-113104-01', name: '0.75–0.95:1 Short Zoom',        tr_min: 0.75, tr_max: 0.95, type: 'Short Throw Zoom',   fl: '~16–20 mm' },
+      { part: '140-113103-01', name: '0.95–1.22:1 Zoom',              tr_min: 0.95, tr_max: 1.22, type: 'Standard Zoom',      fl: '~20–26 mm' },
+      { part: '140-113102-01', name: '1.22–1.53:1 Zoom',              tr_min: 1.22, tr_max: 1.53, type: 'Standard Zoom',      fl: '~26–32 mm' },
+      { part: '140-113101-01', name: '1.52–2.89:1 Zoom',              tr_min: 1.52, tr_max: 2.89, type: 'Standard Zoom',      fl: '~32–61 mm' },
+      { part: '140-113100-01', name: '2.90–4.27:1 Long Zoom',         tr_min: 2.90, tr_max: 4.27, type: 'Long Throw Zoom',    fl: '~61–90 mm' },
+      { part: '140-113099-01', name: '4.27–6.40:1 Long Zoom',         tr_min: 4.27, tr_max: 6.40, type: 'Long Throw Zoom',    fl: '~90–135 mm' },
+      { part: '140-113098-01', name: '6.40–9.60:1 Tele Zoom',         tr_min: 6.40, tr_max: 9.60, type: 'Tele Zoom',          fl: '~135–202 mm' },
+      { part: '140-113097-01', name: '9.58–14.37:1 Super Tele',       tr_min: 9.58, tr_max: 14.37,type: 'Super Tele',         fl: '~202–303 mm' },
+    ]
+  }
+};
+
+function renderBrandTables(throwRatio) {
+  const activeBrands = ['barco','panasonic','nec','epson','christie'].filter(b =>
+    document.getElementById('brand-' + b).checked
+  );
+
+  const container = document.getElementById('brand-lens-tables');
+  const section = document.getElementById('brand-lens-section');
+  container.innerHTML = '';
+
+  if (activeBrands.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
+
+  section.style.display = 'block';
+
+  activeBrands.forEach(brand => {
+    const db = LENS_DB[brand];
+    // Find best match (lens with TR range containing the throw ratio)
+    // Score: exact fit = 2, within 10% = 1, no fit = 0
+    const scored = db.lenses.map(l => {
+      let score = 0;
+      const isFixed = l.tr_min === l.tr_max;
+      if (isFixed) {
+        const diff = Math.abs(throwRatio - l.tr_min) / l.tr_min;
+        if (diff < 0.05) score = 2;
+        else if (diff < 0.15) score = 1;
+      } else {
+        if (throwRatio >= l.tr_min &amp;&amp; throwRatio <= l.tr_max) score = 2;
+        else if (throwRatio >= l.tr_min * 0.9 &amp;&amp; throwRatio <= l.tr_max * 1.1) score = 1;
+      }
+      return { ...l, score };
+    });
+
+    const maxScore = Math.max(...scored.map(l => l.score));
+
+    let rows = scored.map(l => {
+      const isBest = l.score === 2 &amp;&amp; maxScore === 2;
+      const isOk   = l.score === 1 &amp;&amp; maxScore < 2;
+      const rowClass = isBest ? 'best-match' : (l.score >= 1 ? 'match' : '');
+      const badge = isBest ? `<span class=&quot;match-badge best&quot;>✓ Match</span>`
+                  : (isOk  ? `<span class=&quot;match-badge ok&quot;>Near</span>` : '');
+      const trRange = l.tr_min === l.tr_max
+        ? `${l.tr_min.toFixed(2)}:1 (fixed)`
+        : `${l.tr_min.toFixed(2)} – ${l.tr_max.toFixed(2)} : 1`;
+      return `
+        <tr class=&quot;${rowClass}&quot;>
+          <td>${l.name}${badge}</td>
+          <td class=&quot;part-num&quot;>${l.part}</td>
+          <td>${trRange}</td>
+          <td>${l.fl}</td>
+          <td style=&quot;color:var(--muted)&quot;>${l.type}</td>
+        </tr>`;
+    }).join('');
+
+    container.innerHTML += `
+      <div class=&quot;brand-section&quot;>
+        <div class=&quot;brand-header ${brand}&quot;>
+          <span style=&quot;width:8px;height:8px;border-radius:50%;background:${db.color};display:inline-block&quot;></span>
+          ${db.name} — Interchangeable Lens Catalogue
+        </div>
+        <div class=&quot;brand-section-wrap&quot;>
+          <table class=&quot;lens-table&quot;>
+            <thead>
+              <tr>
+                <th>Lens Name</th>
+                <th>Part #</th>
+                <th>Throw Ratio Range</th>
+                <th>Focal Length</th>
+                <th>Type</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+        <div style=&quot;font-size:0.74rem;color:var(--muted);padding:8px 2px;&quot;>${db.note}</div>
+      </div>`;
+  });
+}
+
+function drawDiagram(td, sw, sh) {
+  const svg = document.getElementById('diagram');
+  const W = 600, H = 140;
+  const PAD = 30;
+  const projX = PAD + 30;
+  const screenX = W - PAD - 10;
+  const midY = H / 2;
+  const screenHPx = Math.min(sh / sw * 80, 90);
+  const projY = midY;
+
+  svg.innerHTML = `
+    <!-- beam trapezoid -->
+    <polygon points=&quot;${projX},${midY} ${screenX},${midY - screenHPx/2} ${screenX},${midY + screenHPx/2}&quot; 
+      fill=&quot;rgba(255,51,51,0.05)&quot; stroke=&quot;rgba(255,51,51,0.3)&quot; stroke-width=&quot;1&quot; stroke-dasharray=&quot;4 3&quot;/>
+    
+    <!-- top/bottom beam lines -->
+    <line x1=&quot;${projX}&quot; y1=&quot;${midY}&quot; x2=&quot;${screenX}&quot; y2=&quot;${midY - screenHPx/2}&quot;
+      stroke=&quot;rgba(180,180,180,0.4)&quot; stroke-width=&quot;1&quot;/>
+    <line x1=&quot;${projX}&quot; y1=&quot;${midY}&quot; x2=&quot;${screenX}&quot; y2=&quot;${midY + screenHPx/2}&quot;
+      stroke=&quot;rgba(180,180,180,0.4)&quot; stroke-width=&quot;1&quot;/>
+    
+    <!-- screen -->
+    <rect x=&quot;${screenX}&quot; y=&quot;${midY - screenHPx/2}&quot; width=&quot;8&quot; height=&quot;${screenHPx}&quot;
+      fill=&quot;#1a1e28&quot; stroke=&quot;#aaaaaa&quot; stroke-width=&quot;1.5&quot; rx=&quot;1&quot;/>
+    
+    <!-- projector body -->
+    <rect x=&quot;${projX - 30}&quot; y=&quot;${midY - 14}&quot; width=&quot;32&quot; height=&quot;28&quot; rx=&quot;3&quot;
+      fill=&quot;#1a1e28&quot; stroke=&quot;#ff3333&quot; stroke-width=&quot;1.5&quot;/>
+    <circle cx=&quot;${projX}&quot; cy=&quot;${midY}&quot; r=&quot;5&quot; fill=&quot;none&quot; stroke=&quot;#ff3333&quot; stroke-width=&quot;1.5&quot;/>
+    <circle cx=&quot;${projX}&quot; cy=&quot;${midY}&quot; r=&quot;2&quot; fill=&quot;#ff3333&quot; opacity=&quot;0.7&quot;/>
+    
+    <!-- throw distance arrow -->
+    <line x1=&quot;${projX}&quot; y1=&quot;${H - 16}&quot; x2=&quot;${screenX}&quot; y2=&quot;${H - 16}&quot;
+      stroke=&quot;${'#5a6478'}&quot; stroke-width=&quot;1&quot;/>
+    <polygon points=&quot;${projX},${H-16} ${projX+7},${H-19} ${projX+7},${H-13}&quot; fill=&quot;#5a6478&quot;/>
+    <polygon points=&quot;${screenX},${H-16} ${screenX-7},${H-19} ${screenX-7},${H-13}&quot; fill=&quot;#5a6478&quot;/>
+    <text x=&quot;${(projX + screenX)/2}&quot; y=&quot;${H - 6}&quot; text-anchor=&quot;middle&quot;
+      font-family=&quot;'Share Tech Mono',monospace&quot; font-size=&quot;10&quot; fill=&quot;#5a6478&quot;>
+      throw: ${td.toFixed(2)} m
+    </text>
+    
+    <!-- screen width label -->
+    <line x1=&quot;${screenX + 14}&quot; y1=&quot;${midY - screenHPx/2}&quot; x2=&quot;${screenX + 14}&quot; y2=&quot;${midY + screenHPx/2}&quot;
+      stroke=&quot;#5a6478&quot; stroke-width=&quot;1&quot;/>
+    <text x=&quot;${screenX + 22}&quot; y=&quot;${midY + 4}&quot; font-family=&quot;'Share Tech Mono',monospace&quot; font-size=&quot;9&quot; fill=&quot;#5a6478&quot;>
+      ${sw.toFixed(2)}m
+    </text>
+  `;
+}
+
+</script>
+</body>
+</html>"></iframe>
 </div>
 
 <div class="panel" id="panel-slides">
