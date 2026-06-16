@@ -121,6 +121,9 @@
   <button class="nav-tab" data-panel="slides" onclick="showPanel('slides')">
     Slide Export
   </button>
+  <button class="nav-tab" data-panel="ratio" onclick="showPanel('ratio')">
+    Ratio Calc
+  </button>
 </nav>
 
 <div class="panel active" id="panel-colour">
@@ -3545,5 +3548,500 @@ window.addEventListener('load', () => {
     document.querySelector('[data-panel="' + name + '"]').classList.add('active');
   }
 </script>
+<div class="panel" id="panel-ratio">
+  <iframe srcdoc="<!DOCTYPE html>
+<html lang=&quot;en&quot;>
+<head>
+<meta charset=&quot;UTF-8&quot;>
+<meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;>
+<title>Ratio Calculator</title>
+<link href=&quot;https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&amp;family=DM+Sans:wght@300;400;500;600&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --panel: #131313;
+    --surface2: #1a1a1a;
+    --border: #252525;
+    --accent: #ff3333;
+    --text: #f0f0f0;
+    --muted: #555;
+    --radius: 3px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: &quot;DM Sans&quot;, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  #topbar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 0 16px;
+    height: 46px;
+    background: #000;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .topbar-title {
+    font-family: &quot;JetBrains Mono&quot;, monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+
+  .topbar-sep { flex: 1; }
+
+  #main {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    justify-content: center;
+    padding: 32px 24px 48px;
+    background:
+      radial-gradient(ellipse at 70% 20%, rgba(255,51,51,0.04) 0%, transparent 55%),
+      var(--bg);
+  }
+
+  #main::-webkit-scrollbar { width: 4px; }
+  #main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .content {
+    width: 100%;
+    max-width: 640px;
+  }
+
+  /* ── Panel label ── */
+  .panel-label {
+    font-family: &quot;JetBrains Mono&quot;, monospace;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+
+  /* ── Description ── */
+  .desc {
+    font-family: &quot;JetBrains Mono&quot;, monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 28px;
+    line-height: 1.6;
+    letter-spacing: 0.3px;
+  }
+
+  /* ── Input row ── */
+  .ratio-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .ratio-field {
+    flex: 1;
+    min-width: 72px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .ratio-field label {
+    font-family: &quot;JetBrains Mono&quot;, monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .ratio-field input {
+    width: 100%;
+    background: #0d0d0d;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: &quot;JetBrains Mono&quot;, monospace;
+    font-size: 13px;
+    padding: 8px 10px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .ratio-field input:focus { border-color: var(--accent); }
+  .ratio-field input::-webkit-inner-spin-button,
+  .ratio-field input::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+  .ratio-sep {
+    font-family: &quot;JetBrains Mono&quot;, monospace;
+    font-size: 18px;
+    color: var(--border);
+    padding-bottom: 9px;
+    flex-shrink: 0;
+    user-select: none;
+  }
+
+  /* ── Buttons ── */
+  .btn-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+
+  .btn {
+    font-family: &quot;JetBrains Mono&quot;, monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .btn-accent {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    font-weight: 700;
+  }
+  .btn-accent:hover { background: #cc1f1f; border-color: #cc1f1f; color: #fff; }
+
+  /* ── Error ── */
+  .error-msg {
+    font-family: &quot;JetBrains Mono&quot;, monospace;
+    font-size: 11px;
+    color: #ff6b6b;
+    background: rgba(255,51,51,0.07);
+    border: 1px solid rgba(255,51,51,0.2);
+    border-radius: var(--radius);
+    padding: 9px 13px;
+    margin-bottom: 18px;
+    display: none;
+  }
+
+  /* ── Result hero ── */
+  .result-hero {
+    background: rgba(255,51,51,0.06);
+    border: 1px solid rgba(255,51,51,0.2);
+    border-radius: 5px;
+    padding: 18px 20px;
+    margin-bottom: 14px;
+    display: none;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: center;
+  }
+
+  .result-hero.show { display: flex; }
+
+  .hero-block { display: flex; flex-direction: column; gap: 3px; }
+
+  .hero-label {
+    font-family: &quot;JetBrains Mono&quot;, monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .hero-value {
+    font-family: &quot;JetBrains Mono&quot;, monospace;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .hero-sep {
+    width: 1px;
+    height: 36px;
+    background: rgba(255,51,51,0.2);
+    flex-shrink: 0;
+  }
+
+  /* ── Stat cards ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 8px;
+    margin-bottom: 18px;
+    display: none;
+  }
+
+  .stat-grid.show { display: grid; }
+
+  .stat-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px 14px;
+    text-align: center;
+  }
+
+  .stat-card-label {
+    font-family: &quot;JetBrains Mono&quot;, monospace;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 5px;
+  }
+
+  .stat-card-val {
+    font-family: &quot;JetBrains Mono&quot;, monospace;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  /* ── Bar ── */
+  .bar-wrap { display: none; }
+  .bar-wrap.show { display: block; }
+
+  .bar-label {
+    font-family: &quot;JetBrains Mono&quot;, monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 7px;
+  }
+
+  .bar {
+    display: flex;
+    border-radius: 3px;
+    overflow: hidden;
+    height: 26px;
+  }
+
+  .bar-a {
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: &quot;JetBrains Mono&quot;, monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: #fff;
+    transition: width 0.3s;
+  }
+
+  .bar-b {
+    background: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: &quot;JetBrains Mono&quot;, monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: #aaa;
+    transition: width 0.3s;
+  }
+</style>
+</head>
+<body>
+
+<div id=&quot;topbar&quot;>
+  <span class=&quot;topbar-title&quot;>Ratio Calculator</span>
+</div>
+
+<div id=&quot;main&quot;>
+  <div class=&quot;content&quot;>
+
+    <div class=&quot;panel-label&quot;>Simplify or Solve</div>
+    <p class=&quot;desc&quot;>Enter A and B to simplify a ratio. Fill three of A : B = C : D to solve for the missing value.</p>
+
+    <div class=&quot;ratio-row&quot;>
+      <div class=&quot;ratio-field&quot;>
+        <label>A</label>
+        <input type=&quot;number&quot; id=&quot;va&quot; placeholder=&quot;e.g. 12&quot;>
+      </div>
+      <div class=&quot;ratio-sep&quot;>:</div>
+      <div class=&quot;ratio-field&quot;>
+        <label>B</label>
+        <input type=&quot;number&quot; id=&quot;vb&quot; placeholder=&quot;e.g. 8&quot;>
+      </div>
+      <div class=&quot;ratio-sep&quot; style=&quot;padding-bottom:9px;font-size:15px;color:#333&quot;>=</div>
+      <div class=&quot;ratio-field&quot;>
+        <label>C</label>
+        <input type=&quot;number&quot; id=&quot;vc&quot; placeholder=&quot;optional&quot;>
+      </div>
+      <div class=&quot;ratio-sep&quot;>:</div>
+      <div class=&quot;ratio-field&quot;>
+        <label>D</label>
+        <input type=&quot;number&quot; id=&quot;vd&quot; placeholder=&quot;optional&quot;>
+      </div>
+    </div>
+
+    <div class=&quot;btn-row&quot;>
+      <button class=&quot;btn btn-accent&quot; onclick=&quot;calculate()&quot;>Calculate</button>
+      <button class=&quot;btn&quot; onclick=&quot;clearAll()&quot;>Clear</button>
+      <button class=&quot;btn&quot; onclick=&quot;swapAB()&quot;>Swap A ↔ B</button>
+    </div>
+
+    <div class=&quot;error-msg&quot; id=&quot;error-box&quot;></div>
+
+    <div class=&quot;result-hero&quot; id=&quot;result-hero&quot;>
+      <div class=&quot;hero-block&quot;>
+        <div class=&quot;hero-label&quot; id=&quot;res-label&quot;>Lowest ratio</div>
+        <div class=&quot;hero-value&quot; id=&quot;res-value&quot;>—</div>
+      </div>
+      <div class=&quot;hero-sep&quot; id=&quot;res-sep&quot;></div>
+      <div class=&quot;hero-block&quot; id=&quot;res-extra&quot; style=&quot;display:none&quot;>
+        <div class=&quot;hero-label&quot; id=&quot;res-extra-label&quot;></div>
+        <div class=&quot;hero-value&quot; id=&quot;res-extra-value&quot;></div>
+      </div>
+    </div>
+
+    <div class=&quot;stat-grid&quot; id=&quot;stat-grid&quot;>
+      <div class=&quot;stat-card&quot;>
+        <div class=&quot;stat-card-label&quot;>A as % of total</div>
+        <div class=&quot;stat-card-val&quot; id=&quot;pct-a&quot;>—</div>
+      </div>
+      <div class=&quot;stat-card&quot;>
+        <div class=&quot;stat-card-label&quot;>B as % of total</div>
+        <div class=&quot;stat-card-val&quot; id=&quot;pct-b&quot;>—</div>
+      </div>
+      <div class=&quot;stat-card&quot;>
+        <div class=&quot;stat-card-label&quot;>Decimal (A÷B)</div>
+        <div class=&quot;stat-card-val&quot; id=&quot;decimal&quot;>—</div>
+      </div>
+      <div class=&quot;stat-card&quot;>
+        <div class=&quot;stat-card-label&quot; id=&quot;simplified-label&quot;>Simplified</div>
+        <div class=&quot;stat-card-val&quot; id=&quot;simplified&quot;>—</div>
+      </div>
+    </div>
+
+    <div class=&quot;bar-wrap&quot; id=&quot;bar-wrap&quot;>
+      <div class=&quot;bar-label&quot;>Visual split</div>
+      <div class=&quot;bar&quot;>
+        <div class=&quot;bar-a&quot; id=&quot;bar-a&quot;></div>
+        <div class=&quot;bar-b&quot; id=&quot;bar-b&quot;></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function gcd(a,b){return b===0?a:gcd(b,a%b);}
+  function getVal(id){const v=parseFloat(document.getElementById(id).value);return isNaN(v)?null:v;}
+  function setVal(id,v){document.getElementById(id).value=parseFloat(v.toFixed(6));}
+
+  function showError(msg){
+    const el=document.getElementById('error-box');
+    el.textContent=msg; el.style.display='block';
+    document.getElementById('result-hero').classList.remove('show');
+    document.getElementById('stat-grid').classList.remove('show');
+    document.getElementById('bar-wrap').classList.remove('show');
+  }
+  function hideError(){document.getElementById('error-box').style.display='none';}
+
+  function calculate(){
+    hideError();
+    const a=getVal('va'),b=getVal('vb'),c=getVal('vc'),d=getVal('vd');
+    if(a===null||b===null){showError('A and B are required.');return;}
+    if(a<=0||b<=0){showError('A and B must be greater than zero.');return;}
+    const count=[a,b,c,d].filter(x=>x!==null).length;
+    if(count===4){showError('All four values filled — leave C or D blank to solve for it.');return;}
+    if(count===2) runSimplify(a,b);
+    else runSolve(a,b,c,d);
+  }
+
+  function getSimplified(a,b){
+    const isInt=Number.isInteger(a)&amp;&amp;Number.isInteger(b);
+    if(isInt){const g=gcd(a,b);return (a/g)+' : '+(b/g);}
+    const dec=Math.max((a.toString().split('.')[1]||'').length,(b.toString().split('.')[1]||'').length);
+    const mult=Math.pow(10,dec);
+    const g=gcd(Math.round(a*mult),Math.round(b*mult));
+    return (Math.round(a*mult)/g)+' : '+(Math.round(b*mult)/g);
+  }
+
+  function runSimplify(a,b){
+    const simplified=getSimplified(a,b);
+    const isInt=Number.isInteger(a)&amp;&amp;Number.isInteger(b);
+    document.getElementById('res-label').textContent='Lowest ratio';
+    document.getElementById('res-value').textContent=simplified;
+    document.getElementById('res-sep').style.display='block';
+    document.getElementById('res-extra').style.display='block';
+    document.getElementById('res-extra-label').textContent=isInt?'GCD':'Decimal';
+    document.getElementById('res-extra-value').textContent=isInt?gcd(a,b):(a/b).toFixed(4);
+    document.getElementById('simplified-label').textContent='A : 1';
+    document.getElementById('simplified').textContent=(a/b).toFixed(3)+' : 1';
+    document.getElementById('result-hero').classList.add('show');
+    updateStats(a,b);
+  }
+
+  function runSolve(a,b,c,d){
+    let key,val;
+    if(c===null){if(b===0){showError('B cannot be zero.');return;}val=(a*d)/b;key='vc';}
+    else if(d===null){if(a===0){showError('A cannot be zero.');return;}val=(b*c)/a;key='vd';}
+    setVal(key,val);
+    const el=document.getElementById(key);
+    el.style.borderColor='var(--accent)';
+    setTimeout(()=>el.style.borderColor='',1200);
+    document.getElementById('res-label').textContent='Solved for '+{vc:'C',vd:'D'}[key];
+    document.getElementById('res-value').textContent=parseFloat(val.toFixed(6));
+    document.getElementById('res-sep').style.display='none';
+    document.getElementById('res-extra').style.display='none';
+    document.getElementById('simplified-label').textContent='Simplified A : B';
+    document.getElementById('simplified').textContent=getSimplified(a,b);
+    document.getElementById('result-hero').classList.add('show');
+    updateStats(a,b);
+  }
+
+  function updateStats(a,b){
+    const total=a+b,pA=a/total*100;
+    document.getElementById('pct-a').textContent=(a/total*100).toFixed(1)+'%';
+    document.getElementById('pct-b').textContent=(b/total*100).toFixed(1)+'%';
+    document.getElementById('decimal').textContent=(a/b).toFixed(4);
+    document.getElementById('bar-a').style.width=pA.toFixed(1)+'%';
+    document.getElementById('bar-b').style.width=(100-pA).toFixed(1)+'%';
+    document.getElementById('bar-a').textContent=pA>8?pA.toFixed(1)+'%':'';
+    document.getElementById('bar-b').textContent=(100-pA)>8?(100-pA).toFixed(1)+'%':'';
+    document.getElementById('stat-grid').classList.add('show');
+    document.getElementById('bar-wrap').classList.add('show');
+  }
+
+  function clearAll(){
+    ['va','vb','vc','vd'].forEach(id=>{
+      document.getElementById(id).value='';
+      document.getElementById(id).style.borderColor='';
+    });
+    hideError();
+    document.getElementById('result-hero').classList.remove('show');
+    document.getElementById('stat-grid').classList.remove('show');
+    document.getElementById('bar-wrap').classList.remove('show');
+  }
+
+  function swapAB(){
+    const a=document.getElementById('va').value;
+    document.getElementById('va').value=document.getElementById('vb').value;
+    document.getElementById('vb').value=a;
+  }
+
+  document.addEventListener('keydown',e=>{if(e.key==='Enter')calculate();});
+</script>
+</body>
+</html>"></iframe>
+</div>
 </body>
 </html>
