@@ -16,10 +16,12 @@
     --text: #f0f0f0;
     --muted: #555;
     --nav-h: 48px;
+    --tab-bar-h: 0px;
   }
 
   html, body {
     height: 100%;
+    height: 100dvh;
     background: var(--bg);
     color: var(--text);
     font-family: 'DM Mono', monospace;
@@ -35,35 +37,40 @@
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
-    padding: 0 16px;
-    gap: 6px;
+    padding: 0 12px;
+    gap: 4px;
     z-index: 1000;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
   }
+  #nav::-webkit-scrollbar { display: none; }
 
   .nav-logo {
     font-family: 'Syne', sans-serif;
     font-weight: 800;
-    font-size: 14px;
+    font-size: 13px;
     letter-spacing: -0.03em;
     color: var(--text);
-    margin-right: 10px;
+    margin-right: 8px;
     white-space: nowrap;
+    flex-shrink: 0;
   }
-
   .nav-logo span { color: var(--accent); }
 
   .nav-sep {
-    width: 1px;
-    height: 22px;
+    width: 1px; height: 20px;
     background: var(--border);
-    margin-right: 6px;
+    margin-right: 4px;
+    flex-shrink: 0;
   }
 
   .nav-tab {
     font-family: 'DM Mono', monospace;
     font-size: 11px;
     letter-spacing: 0.04em;
-    padding: 5px 13px;
+    padding: 5px 11px;
     border-radius: 5px;
     border: 1px solid transparent;
     background: transparent;
@@ -71,36 +78,97 @@
     cursor: pointer;
     transition: all 0.15s;
     white-space: nowrap;
-    display: flex;
-    align-items: center;
-    gap: 7px;
+    flex-shrink: 0;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
-
-  .nav-tab .icon { font-size: 13px; }
   .nav-tab:hover { color: var(--text); background: #161616; }
-
   .nav-tab.active {
     background: var(--accent);
-    color: #000;
-    font-weight: 500;
+    color: #fff;
+    font-weight: 600;
     border-color: var(--accent);
   }
 
-  /* ── Iframe panels ── */
+  /* ── Panels ── */
   .panel {
     position: fixed;
     top: var(--nav-h);
-    left: 0; right: 0; bottom: 0;
+    left: 0; right: 0;
+    bottom: var(--tab-bar-h);
     display: none;
   }
-
   .panel.active { display: block; }
-
   .panel iframe {
     width: 100%;
     height: 100%;
     border: none;
     display: block;
+  }
+
+  /* ── Bottom tab bar (mobile only) ── */
+  #bottom-nav {
+    display: none;
+  }
+
+  @media (max-width: 600px) {
+    :root {
+      --nav-h: 44px;
+      --tab-bar-h: 56px;
+    }
+
+    .nav-tab { display: none; }
+    .nav-sep { display: none; }
+
+    #bottom-nav {
+      display: flex;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: var(--tab-bar-h);
+      background: var(--bar);
+      border-top: 1px solid var(--border);
+      z-index: 1000;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    #bottom-nav::-webkit-scrollbar { display: none; }
+
+    .bottom-tab {
+      flex: 1;
+      min-width: 68px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      padding: 6px 2px 8px;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      transition: color 0.15s;
+    }
+    .bottom-tab .bt-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: currentColor;
+      opacity: 0;
+      transition: opacity 0.15s;
+      margin-bottom: 1px;
+    }
+    .bottom-tab.active .bt-dot { opacity: 1; }
+    .bottom-tab .bt-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+    .bottom-tab.active {
+      color: var(--accent);
+    }
   }
 </style>
 </head>
@@ -125,6 +193,28 @@
     Ratio Calc
   </button>
 </nav>
+<div id="bottom-nav">
+  <button class="bottom-tab active" data-panel="colour" onclick="showPanel('colour')">
+    <div class="bt-dot"></div>
+    <span class="bt-label">Colour</span>
+  </button>
+  <button class="bottom-tab" data-panel="lightengine" onclick="showPanel('lightengine')">
+    <div class="bt-dot"></div>
+    <span class="bt-label">Test Pattern</span>
+  </button>
+  <button class="bottom-tab" data-panel="lens" onclick="showPanel('lens')">
+    <div class="bt-dot"></div>
+    <span class="bt-label">Lens Calc</span>
+  </button>
+  <button class="bottom-tab" data-panel="slides" onclick="showPanel('slides')">
+    <div class="bt-dot"></div>
+    <span class="bt-label">Slide Export</span>
+  </button>
+  <button class="bottom-tab" data-panel="ratio" onclick="showPanel('ratio')">
+    <div class="bt-dot"></div>
+    <span class="bt-label">Ratio Calc</span>
+  </button>
+</div>
 
 <div class="panel active" id="panel-colour">
   <iframe srcdoc="<!DOCTYPE html>
@@ -383,6 +473,40 @@
   /* Scrollbar */
   #side::-webkit-scrollbar { width: 4px; }
   #side::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* ── Mobile responsive ── */
+  @media (max-width: 600px) {
+    body { overflow: auto; height: 100dvh; }
+
+    #topbar { height: 42px; padding: 0 12px; }
+    .topbar-title { font-size: 10px; }
+
+    #main { flex-direction: column; overflow-y: auto; overflow-x: hidden; }
+
+    #side {
+      width: 100%;
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+      overflow-y: visible;
+      flex-shrink: 0;
+    }
+
+    #preview-area {
+      padding: 20px 16px 32px;
+      min-height: 300px;
+    }
+
+    #color-swatch {
+      max-width: 100%;
+    }
+
+    #output-grid {
+      max-width: 100%;
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .color-row { grid-template-columns: 1fr 1fr; }
+  }
 </style>
 </head>
 <body>
@@ -568,7 +692,7 @@
   }
 </script>
 </body>
-</html>" sandbox="allow-scripts allow-same-origin"></iframe>
+</html>&quot; sandbox=&quot;allow-scripts allow-same-origin"></iframe>
 </div>
 
 <div class="panel" id="panel-lightengine">
@@ -902,6 +1026,9 @@
     gridCol:   '#333333',
     circleCol: '#ffffff',
     crossCol:  '#ff3333',
+    showBorder: true,
+    borderCol:  '#ff3333',
+    borderW:    2,
   };
 
   // ── Draw ──
@@ -2639,6 +2766,41 @@ function drawDiagram(td, sw, sh) {
   }
   .corner-btn:hover { border-color: var(--accent); color: var(--accent); }
   .corner-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
+
+  /* ── Mobile responsive ── */
+  @media (max-width: 700px) {
+    body {
+      grid-template-columns: 1fr;
+      grid-template-rows: 52px auto 1fr;
+      height: 100dvh;
+      overflow: hidden;
+    }
+
+    header { grid-column: 1; }
+
+    .sidebar {
+      grid-column: 1;
+      grid-row: 2;
+      max-height: 45vh;
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+      overflow-y: auto;
+    }
+
+    .main {
+      grid-column: 1;
+      grid-row: 3;
+      overflow: hidden;
+    }
+
+    .slide-input { font-size: 12px; }
+
+    .toolbar { padding: 8px 12px; gap: 6px; }
+    .btn { font-size: 11px; padding: 6px 10px; }
+
+    .section { padding: 12px; }
+    .section-title { font-size: 8px; }
+  }
 </style>
 </head>
 <body>
@@ -3537,15 +3699,15 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
-" sandbox="allow-scripts allow-same-origin allow-downloads allow-modals"></iframe>
+&quot; sandbox=&quot;allow-scripts allow-same-origin allow-downloads allow-modals"></iframe>
 </div>
 
 <script>
   function showPanel(name) {
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.nav-tab, .bottom-tab').forEach(t => t.classList.remove('active'));
     document.getElementById('panel-' + name).classList.add('active');
-    document.querySelector('[data-panel="' + name + '"]').classList.add('active');
+    document.querySelectorAll('[data-panel="' + name + '"]').forEach(t => t.classList.add('active'));
   }
 </script>
 <div class="panel" id="panel-ratio">
