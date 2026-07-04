@@ -8,3 +8,4 @@ A personal collection of browser-based tools, hosted on GitHub Pages.
 - **Lens Calc** - Caluclate Lens Requirements for Projection across brands
 - **Slide Export** — Create and export presentation slides as PNG
 - **Ratio Calc** — Simple caluctlator for ratios
+- **Format Calc** — A VESA CVT timing calculator for the Barco E2 and S3 event processors
