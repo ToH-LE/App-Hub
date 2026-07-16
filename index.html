@@ -933,6 +933,23 @@
   }
 
   .spacer { flex: 1; }
+
+  .pos-btn {
+    padding: 5px 4px;
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    margin-top: 0;
+  }
+  .pos-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    font-weight: 700;
+  }
+  .pos-btn:hover:not(.active) {
+    border-color: var(--text);
+    color: var(--text);
+  }
 </style>
 </head>
 <body>
@@ -996,6 +1013,35 @@
       </div>
     </div>
 
+    <!-- TEXT -->
+    <div class=&quot;panel-section&quot;>
+      <div class=&quot;panel-label&quot;>Text Overlay</div>
+      <div class=&quot;ctrl-row&quot;>
+        <span class=&quot;ctrl-label&quot;>Show Text</span>
+        <label class=&quot;toggle&quot;><input type=&quot;checkbox&quot; id=&quot;show-text&quot; checked><span class=&quot;toggle-slider&quot;></span></label>
+      </div>
+      <div class=&quot;field&quot; style=&quot;margin-top:8px;&quot;>
+        <textarea id=&quot;text-content&quot; placeholder=&quot;Enter overlay text...&quot; rows=&quot;3&quot; style=&quot;width:100%;background:#0d0d0d;border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:12px;padding:7px 9px;outline:none;resize:vertical;transition:border-color 0.15s;line-height:1.5;&quot; oninput=&quot;state.textContent=this.value;draw()&quot;></textarea>
+      </div>
+      <div class=&quot;ctrl-label&quot; style=&quot;font-size:11px;margin:8px 0 4px;color:#777&quot;>Size (px)</div>
+      <input type=&quot;number&quot; id=&quot;text-size&quot; value=&quot;48&quot; min=&quot;8&quot; max=&quot;400&quot;>
+      <div class=&quot;ctrl-label&quot; style=&quot;font-size:11px;margin:8px 0 4px;color:#777&quot;>Position</div>
+      <div style=&quot;display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-bottom:6px;&quot;>
+        <button class=&quot;btn pos-btn active&quot; data-pos=&quot;top-left&quot;>TL</button>
+        <button class=&quot;btn pos-btn&quot; data-pos=&quot;top&quot;>TC</button>
+        <button class=&quot;btn pos-btn&quot; data-pos=&quot;top-right&quot;>TR</button>
+        <button class=&quot;btn pos-btn&quot; data-pos=&quot;left&quot;>ML</button>
+        <button class=&quot;btn pos-btn&quot; data-pos=&quot;center&quot;>C</button>
+        <button class=&quot;btn pos-btn&quot; data-pos=&quot;right&quot;>MR</button>
+        <button class=&quot;btn pos-btn&quot; data-pos=&quot;bottom-left&quot;>BL</button>
+        <button class=&quot;btn pos-btn&quot; data-pos=&quot;bottom&quot;>BC</button>
+        <button class=&quot;btn pos-btn&quot; data-pos=&quot;bottom-right&quot;>BR</button>
+      </div>
+      <div class=&quot;color-row&quot;>
+        <div class=&quot;color-item&quot;><label>Colour</label><input type=&quot;color&quot; id=&quot;col-text&quot; value=&quot;#ffffff&quot;></div>
+      </div>
+    </div>
+
     <!-- EXPORT -->
     <div class=&quot;panel-section&quot;>
       <div class=&quot;panel-label&quot;>Export</div>
@@ -1036,6 +1082,11 @@
     showBorder: true,
     borderCol:  '#ff3333',
     borderW:    2,
+    showText:   true,
+    textContent: '',
+    textSize:   48,
+    textCol:    '#ffffff',
+    textPos:    'center',
   };
 
   // ── Draw ──
@@ -1147,6 +1198,32 @@
     ctx.fillText(`${W}px × ${H}px`, cx, cy - H*0.13);
     ctx.globalAlpha = 1;
 
+
+    // Text overlay
+    if (state.showText &amp;&amp; state.textContent.trim()) {
+      const lines = state.textContent.split('\n');
+      const fs = Math.max(8, state.textSize);
+      ctx.font = `600 ${fs}px 'JetBrains Mono', monospace`;
+      ctx.fillStyle = state.textCol;
+      ctx.globalAlpha = 1;
+      const lh = fs * 1.3;
+      const totalH = lines.length * lh;
+      const pad = fs * 0.6;
+      const pos = state.textPos;
+      let baseX, baseY;
+      const isLeft   = pos.includes('left');
+      const isRight  = pos.includes('right');
+      const isTop    = pos.includes('top');
+      const isBottom = pos.includes('bottom');
+      baseX = isLeft ? pad : isRight ? W - pad : cx;
+      baseY = isTop  ? pad + fs : isBottom ? H - pad - totalH + fs : cy - totalH/2 + fs;
+      ctx.textBaseline = 'alphabetic';
+      ctx.textAlign = isLeft ? 'left' : isRight ? 'right' : 'center';
+      lines.forEach((line, i) => {
+        ctx.fillText(line, baseX, baseY + i * lh);
+      });
+    }
+
     // Border
     if (state.showBorder) {
       const bw = Math.max(1, state.borderW);
@@ -1183,6 +1260,25 @@
   bind('col-grid',    'gridCol',    'str');
   bind('col-circle',  'circleCol',  'str');
   bind('col-cross',   'crossCol',   'str');
+
+  bind('show-text',  'showText',    'bool');
+  bind('text-size',  'textSize',    'num');
+  bind('col-text',   'textCol',     'str');
+
+  // Position grid
+  document.querySelectorAll('.pos-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.pos-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.textPos = btn.dataset.pos;
+      draw();
+    });
+  });
+
+  // Set default active to center
+  document.querySelector('[data-pos=&quot;center&quot;]').classList.add('active');
+  document.querySelector('[data-pos=&quot;top-left&quot;]').classList.remove('active');
+
   bind('show-border', 'showBorder', 'bool');
   bind('border-w',    'borderW',    'num');
   bind('col-border',  'borderCol',  'str');
@@ -1278,6 +1374,29 @@
     ectx.textAlign='center'; ectx.textBaseline='middle';
     ectx.fillText(`${W}px × ${H}px`, cx, cy-H*0.13);
     ectx.globalAlpha=1;
+
+
+    // Text overlay
+    if (state.showText &amp;&amp; state.textContent.trim()) {
+      const lines = state.textContent.split('\n');
+      const fs = Math.max(8, state.textSize);
+      ectx.font = `600 ${fs}px 'JetBrains Mono', monospace`;
+      ectx.fillStyle = state.textCol;
+      ectx.globalAlpha = 1;
+      const lh = fs * 1.3;
+      const totalH = lines.length * lh;
+      const pad = fs * 0.6;
+      const pos = state.textPos;
+      const isLeft   = pos.includes('left');
+      const isRight  = pos.includes('right');
+      const isTop    = pos.includes('top');
+      const isBottom = pos.includes('bottom');
+      let baseX = isLeft ? pad : isRight ? W - pad : W/2;
+      let baseY = isTop  ? pad + fs : isBottom ? H - pad - totalH + fs : H/2 - totalH/2 + fs;
+      ectx.textBaseline = 'alphabetic';
+      ectx.textAlign = isLeft ? 'left' : isRight ? 'right' : 'center';
+      lines.forEach((line, i) => { ectx.fillText(line, baseX, baseY + i * lh); });
+    }
 
     if (state.showBorder) {
       const bw = Math.max(1, state.borderW);
@@ -4368,6 +4487,17 @@ window.addEventListener('load', () => {
   .error.show{ display:block; }
 
   footer{ text-align:center; margin-top: 18px; font-size: 10px; font-family: 'JetBrains Mono', monospace; color: var(--muted); line-height:1.7; }
+
+  /* ── Timing two-column layout ── */
+  .timing-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 18px; }
+  .timing-col { min-width: 0; }
+  .timing-pclk { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+  .stat-pclk-mobile { display: none; }
+  @media (max-width: 600px) {
+    .timing-cols { grid-template-columns: 1fr; }
+    .timing-pclk { display: none; }
+    .stat-pclk-mobile { display: flex; }
+  }
 </style>
 </head>
 <body>
@@ -4396,10 +4526,16 @@ window.addEventListener('load', () => {
 
     <div class=&quot;field yn-row&quot;>
       <label>Reduce Blanking</label>
-      <div class=&quot;yn-toggle&quot; id=&quot;rbGroup&quot;>
+      <div class=&quot;yn-toggle&quot; id=&quot;rbYN&quot;>
+        <button class=&quot;yn-btn&quot; data-val=&quot;1&quot;>Yes</button>
         <button class=&quot;yn-btn&quot; data-val=&quot;0&quot;>No</button>
-        <button class=&quot;yn-btn&quot; data-val=&quot;1&quot;>Version 1</button>
-        <button class=&quot;yn-btn&quot; data-val=&quot;2&quot;>Version 2</button>
+      </div>
+    </div>
+    <div class=&quot;field ver-row&quot; id=&quot;verRow&quot;>
+      <label>Reduced Blank Timing Version</label>
+      <div class=&quot;ver-toggle&quot; id=&quot;rbVerToggle&quot;>
+        <button class=&quot;ver-btn&quot; data-val=&quot;1&quot;>Version 1</button>
+        <button class=&quot;ver-btn&quot; data-val=&quot;2&quot;>Version 2</button>
       </div>
     </div>
 
@@ -4412,63 +4548,70 @@ window.addEventListener('load', () => {
   <div class=&quot;panel&quot;>
     <h2 class=&quot;sec&quot;>Timing</h2>
 
-    <div class=&quot;field&quot;>
-      <label>H Total</label>
-      <div class=&quot;slider-row&quot; id=&quot;row-hTotal&quot;></div>
-    </div>
-    <div class=&quot;field&quot;>
-      <label>H Front Porch</label>
-      <div class=&quot;slider-row&quot; id=&quot;row-hFP&quot;></div>
-    </div>
-    <div class=&quot;field&quot;>
-      <label>H Active</label>
-      <div class=&quot;slider-row&quot; id=&quot;row-hActive&quot;></div>
-    </div>
-    <div class=&quot;field&quot;>
-      <label>H Sync</label>
-      <div class=&quot;slider-row&quot; id=&quot;row-hSync&quot;></div>
-    </div>
-    <div class=&quot;field polarity-row&quot;>
-      <label>H Polarity</label>
-      <div class=&quot;pol-toggle&quot; id=&quot;pol-h&quot;>
-        <button class=&quot;pol-btn&quot; data-val=&quot;1&quot;>+</button>
-        <button class=&quot;pol-btn&quot; data-val=&quot;0&quot;>−</button>
+    <div class=&quot;timing-cols&quot;>
+      <div class=&quot;timing-col&quot;>
+        <div class=&quot;field&quot;>
+          <label>H Total</label>
+          <div class=&quot;slider-row&quot; id=&quot;row-hTotal&quot;></div>
+        </div>
+        <div class=&quot;field&quot;>
+          <label>H Front Porch</label>
+          <div class=&quot;slider-row&quot; id=&quot;row-hFP&quot;></div>
+        </div>
+        <div class=&quot;field&quot;>
+          <label>H Active</label>
+          <div class=&quot;slider-row&quot; id=&quot;row-hActive&quot;></div>
+        </div>
+        <div class=&quot;field&quot;>
+          <label>H Sync</label>
+          <div class=&quot;slider-row&quot; id=&quot;row-hSync&quot;></div>
+        </div>
+        <div class=&quot;field polarity-row&quot;>
+          <label>H Polarity</label>
+          <div class=&quot;pol-toggle&quot; id=&quot;pol-h&quot;>
+            <button class=&quot;pol-btn&quot; data-val=&quot;1&quot;>+</button>
+            <button class=&quot;pol-btn&quot; data-val=&quot;0&quot;>−</button>
+          </div>
+        </div>
+        <div class=&quot;stat-row timing-pclk&quot;>
+          <span class=&quot;k&quot;>Pixel Clock</span><span class=&quot;v accent&quot; id=&quot;pclkOut&quot;>—</span>
+        </div>
+      </div>
+
+      <div class=&quot;timing-col&quot;>
+        <div class=&quot;field&quot;>
+          <label>V Total</label>
+          <div class=&quot;slider-row&quot; id=&quot;row-vTotal&quot;></div>
+        </div>
+        <div class=&quot;field&quot;>
+          <label>V Front Porch</label>
+          <div class=&quot;slider-row&quot; id=&quot;row-vFP&quot;></div>
+        </div>
+        <div class=&quot;field&quot;>
+          <label>V Active</label>
+          <div class=&quot;slider-row&quot; id=&quot;row-vActive&quot;></div>
+        </div>
+        <div class=&quot;field&quot;>
+          <label>V Sync</label>
+          <div class=&quot;slider-row&quot; id=&quot;row-vSync&quot;></div>
+        </div>
+        <div class=&quot;field polarity-row&quot;>
+          <label>V Polarity</label>
+          <div class=&quot;pol-toggle&quot; id=&quot;pol-v&quot;>
+            <button class=&quot;pol-btn&quot; data-val=&quot;1&quot;>+</button>
+            <button class=&quot;pol-btn&quot; data-val=&quot;0&quot;>−</button>
+          </div>
+        </div>
+        <div class=&quot;field&quot;>
+          <label>V Rate</label>
+          <div class=&quot;slider-row&quot; id=&quot;row-vRate&quot;></div>
+        </div>
       </div>
     </div>
 
     <hr class=&quot;div&quot;>
 
-    <div class=&quot;field&quot;>
-      <label>V Total</label>
-      <div class=&quot;slider-row&quot; id=&quot;row-vTotal&quot;></div>
-    </div>
-    <div class=&quot;field&quot;>
-      <label>V Front Porch</label>
-      <div class=&quot;slider-row&quot; id=&quot;row-vFP&quot;></div>
-    </div>
-    <div class=&quot;field&quot;>
-      <label>V Active</label>
-      <div class=&quot;slider-row&quot; id=&quot;row-vActive&quot;></div>
-    </div>
-    <div class=&quot;field&quot;>
-      <label>V Sync</label>
-      <div class=&quot;slider-row&quot; id=&quot;row-vSync&quot;></div>
-    </div>
-    <div class=&quot;field polarity-row&quot;>
-      <label>V Polarity</label>
-      <div class=&quot;pol-toggle&quot; id=&quot;pol-v&quot;>
-        <button class=&quot;pol-btn&quot; data-val=&quot;1&quot;>+</button>
-        <button class=&quot;pol-btn&quot; data-val=&quot;0&quot;>−</button>
-      </div>
-    </div>
-    <div class=&quot;field&quot;>
-      <label>V Rate</label>
-      <div class=&quot;slider-row&quot; id=&quot;row-vRate&quot;></div>
-    </div>
-
-    <hr class=&quot;div&quot;>
-
-    <div class=&quot;stat-row&quot;><span class=&quot;k&quot;>Pixel Clock</span><span class=&quot;v accent&quot; id=&quot;pclkOut&quot;>—</span></div>
+    <div class=&quot;stat-row stat-pclk-mobile&quot;><span class=&quot;k&quot;>Pixel Clock</span><span class=&quot;v accent&quot; id=&quot;pclkOutMobile&quot;>—</span></div>
     <div class=&quot;stat-row&quot;><span class=&quot;k&quot;>H Frequency</span><span class=&quot;v&quot; id=&quot;hfreqOut&quot;>—</span></div>
     <div class=&quot;stat-row&quot;><span class=&quot;k&quot;>Connector capacity needed</span><span class=&quot;badge&quot; id=&quot;capOut&quot;>—</span></div>
     <div class=&quot;caveat&quot;>Capacity estimate only — confirm exact link requirements against your I/O card's spec sheet.</div>
@@ -4600,11 +4743,15 @@ const vcHPix = makeSlider('row-vcHPix', { min:0, max:4096, value:1920 });
 const vcVLin = makeSlider('row-vcVLin', { min:0, max:4096, value:1080 });
 const vcRate = makeSlider('row-vcRate', { min:1, max:300, step:0.001, value:60 });
 
-const rbGroup = makeToggle('rbGroup', 'yn-btn', 0);
+const rbYN = makeToggle('rbYN', 'yn-btn', 1, v => { $('verRow').style.display = v ? 'flex' : 'none'; });
+$('verRow').style.display = rbYN.get() ? 'flex' : 'none';
+const rbVerToggle = makeToggle('rbVerToggle', 'ver-btn', 1);
 
 function recomputeStats(){
   const pclk = hTotal.get() * vTotal.get() * vRate.get() / 1000000;
   $('pclkOut').textContent = (isFinite(pclk) ? pclk.toFixed(3) : '—') + ' MHz';
+  $('pclkOutMobile').textContent = $('pclkOut').textContent;
+  $('pclkOutMobile').textContent = $('pclkOut').textContent;
   const hfreq = vTotal.get() ? (pclk * 1000 / hTotal.get()) : 0;
   $('hfreqOut').textContent = (isFinite(hfreq) ? hfreq.toFixed(3) : '—') + ' kHz';
   let cap = 'SL';
@@ -4666,7 +4813,8 @@ recomputeStats();
 $('calcBtn').addEventListener('click', () => {
   const errBox = $('errBox'); errBox.classList.remove('show'); errBox.textContent = '';
   const hp = vcHPix.get(), vl = vcVLin.get(), fr = vcRate.get();
-  const ver = rbGroup.get();
+  const reduce = rbYN.get();
+  const ver = reduce ? rbVerToggle.get() : 0;
 
   if (!hp || !vl || !fr) {
     errBox.textContent = 'Enter viewable horizontal pixels, vertical lines and frame rate greater than zero.';
