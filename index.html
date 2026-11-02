@@ -195,6 +195,7 @@
   <button class="nav-tab" data-panel="e2" onclick="showPanel('e2')">
     Format Calc
   </button>
+      <button class="nav-tab" data-panel="atem" onclick="showPanel('atem')">ATEM Calc</button>
 </nav>
 <div id="bottom-nav">
   <button class="bottom-tab active" data-panel="colour" onclick="showPanel('colour')">
@@ -220,6 +221,10 @@
   <button class="bottom-tab" data-panel="e2" onclick="showPanel('e2')">
     <div class="bt-dot"></div>
     <span class="bt-label">Format Calc</span>
+  </button>
+  <button class="bottom-tab" data-panel="atem" onclick="showPanel('atem')">
+    <div class="bt-dot"></div>
+    <span class="bt-label">ATEM Calc</span>
   </button>
 </div>
 
@@ -4847,5 +4852,351 @@ $('calcBtn').addEventListener('click', () => {
 </html>
 "></iframe>
 </div>
+
+<div class="panel" id="panel-atem"><iframe srcdoc="<!DOCTYPE html>
+<html lang=&quot;en&quot;>
+<head>
+<meta charset=&quot;utf-8&quot;>
+<meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1,viewport-fit=cover&quot;>
+<title>ATEM SuperSource Pixel Calculator</title>
+<link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;>
+<link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin>
+<link href=&quot;https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
+<style>
+:root{
+  --bg:#0a0a0a;--card:#131313;--ink:#f0f0f0;--mute:#666;
+  --line:#252525;--acc:#ff3333;--acc2:#cc0000;
+  --font-sans:'DM Sans',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--font-sans)}
+.topbar{background:var(--card);border-bottom:1px solid var(--line);padding:0 20px;height:48px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10}
+.topbar-title{font-family:var(--font-mono);font-size:13px;font-weight:600;letter-spacing:0.04em;color:var(--ink)}
+.topbar-sub{font-size:12px;color:var(--mute)}
+main{max-width:960px;margin:0 auto;padding:20px}
+h2{font-family:var(--font-mono);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);margin:0 0 14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:720px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px;margin-bottom:16px}
+label{display:block;font-size:12px;color:var(--mute);margin:10px 0 3px;font-family:var(--font-sans)}
+input,select{
+  width:100%;padding:8px 10px;
+  border:1px solid var(--line);border-radius:6px;
+  background:var(--bg);color:var(--ink);
+  font:14px/1.4 var(--font-mono);
+  outline:none;transition:border-color .15s
+}
+input:focus,select:focus{border-color:var(--acc)}
+input[type=checkbox]{width:auto}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.out{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line);font-family:var(--font-mono);font-size:13px}
+.out b{color:var(--acc)}
+.out:last-child{border:0}
+button{
+  margin-top:12px;padding:8px 14px;
+  border:1px solid var(--line);border-radius:6px;
+  background:var(--acc);color:#fff;
+  font:13px/1 var(--font-mono);font-weight:600;
+  cursor:pointer;transition:background .15s
+}
+button:hover{background:var(--acc2)}
+button.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+button.ghost:hover{border-color:var(--acc);color:var(--acc);background:transparent}
+.r4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+@media(max-width:720px){.r4{grid-template-columns:repeat(2,1fr)}}
+.wrap{overflow-x:auto}
+canvas{width:100%;display:block;border-radius:6px;background:#000;margin-top:14px}
+small{color:var(--mute);display:block;margin-top:10px;font-size:12px;line-height:1.5}
+.warn-text{color:#ff6b6b;font-size:13px;margin-top:8px}
+</style>
+</head>
+<body>
+<div class=&quot;topbar&quot;>
+  <span class=&quot;topbar-title&quot;>ATEM SuperSource Pixel Calculator</span>
+  <span class=&quot;topbar-sub&quot;>Convert pixel positions to SuperSource box values</span>
+</div>
+<main>
+
+<div class=&quot;card&quot;>
+  <h2>Output format</h2>
+  <div class=&quot;row&quot;>
+    <div><label>Preset</label>
+      <select id=&quot;preset&quot;>
+        <option value=&quot;1920x1080&quot;>HD 1920×1080</option>
+        <option value=&quot;3840x2160&quot;>UHD 3840×2160</option>
+        <option value=&quot;custom&quot;>Custom</option>
+      </select>
+    </div>
+    <div class=&quot;row&quot;>
+      <div><label>Width px</label><input id=&quot;W&quot; type=&quot;number&quot; value=&quot;1920&quot;></div>
+      <div><label>Height px</label><input id=&quot;H&quot; type=&quot;number&quot; value=&quot;1080&quot;></div>
+    </div>
+  </div>
+  <small>The frame spans 32 × 18 ATEM units, so 1 unit = <span id=&quot;ppu&quot;></span> px. Centre of frame is 0,0; +Y is up.</small>
+</div>
+
+<div class=&quot;grid&quot;>
+  <div class=&quot;card&quot; style=&quot;margin-bottom:0&quot;>
+    <h2>Pixels → ATEM (with crop)</h2>
+    <div class=&quot;row&quot;>
+      <div><label>Box left (px)</label><input id=&quot;pl&quot; type=&quot;number&quot; value=&quot;960&quot;></div>
+      <div><label>Box top (px)</label><input id=&quot;pt&quot; type=&quot;number&quot; value=&quot;540&quot;></div>
+    </div>
+    <div class=&quot;row&quot;>
+      <div><label>Box width (px)</label><input id=&quot;pw&quot; type=&quot;number&quot; value=&quot;960&quot;></div>
+      <div><label>Box height (px)</label><input id=&quot;ph&quot; type=&quot;number&quot; value=&quot;540&quot;></div>
+    </div>
+    <button id=&quot;r169&quot; class=&quot;ghost&quot; style=&quot;margin-top:8px&quot;>Set height to 16:9 (no crop)</button>
+    <small style=&quot;margin-top:6px&quot;>If height isn't 16:9 the crop is worked out for you, using the anchor and position settings in &quot;Crop to fit&quot; below.</small>
+    <div style=&quot;margin-top:12px&quot;>
+      <div class=&quot;out&quot;><span>X position</span><b id=&quot;ox&quot;></b></div>
+      <div class=&quot;out&quot;><span>Y position</span><b id=&quot;oy&quot;></b></div>
+      <div class=&quot;out&quot;><span>Size</span><b id=&quot;os&quot;></b></div>
+      <div class=&quot;out&quot;><span>Crop Top / Bottom</span><b id=&quot;ocv&quot;></b></div>
+      <div class=&quot;out&quot;><span>Crop Left / Right</span><b id=&quot;och&quot;></b></div>
+      <div class=&quot;out&quot;><span>Box height</span><span id=&quot;oh&quot;></span></div>
+      <div class=&quot;out&quot;><span>Actual pixels after rounding</span><span id=&quot;oa&quot;></span></div>
+      <div class=&quot;out&quot;><span>Max pixel error</span><b id=&quot;oe&quot;></b></div>
+      <div id=&quot;warn&quot; class=&quot;warn-text&quot;></div>
+    </div>
+    <button id=&quot;copy&quot;>Copy values</button>
+  </div>
+
+  <div class=&quot;card&quot; style=&quot;margin-bottom:0&quot;>
+    <h2>ATEM → Pixels</h2>
+    <div class=&quot;row&quot;>
+      <div><label>X (−48 to 48)</label><input id=&quot;ax&quot; type=&quot;number&quot; min=&quot;-48&quot; max=&quot;48&quot; step=&quot;0.01&quot; value=&quot;8&quot;></div>
+      <div><label>Y (−27 to 27)</label><input id=&quot;ay&quot; type=&quot;number&quot; min=&quot;-27&quot; max=&quot;27&quot; step=&quot;0.01&quot; value=&quot;-4.5&quot;></div>
+    </div>
+    <label>Size (0.07 to 1.00)</label><input id=&quot;as&quot; type=&quot;number&quot; min=&quot;0.07&quot; max=&quot;1&quot; step=&quot;0.01&quot; value=&quot;0.5&quot;>
+    <div style=&quot;margin-top:12px&quot;>
+      <div class=&quot;out&quot;><span>Centre</span><b id=&quot;rc&quot;></b></div>
+      <div class=&quot;out&quot;><span>Top-left</span><b id=&quot;rt&quot;></b></div>
+      <div class=&quot;out&quot;><span>Bottom-right</span><span id=&quot;rb&quot;></span></div>
+      <div class=&quot;out&quot;><span>Box size</span><span id=&quot;rs&quot;></span></div>
+    </div>
+  </div>
+</div>
+
+<div class=&quot;card&quot;>
+  <h2>Crop to fit</h2>
+  <p style=&quot;font-size:13px;color:var(--mute);margin-bottom:12px&quot;>Enter the exact rectangle (output pixels) the cropped source should fill. It searches every legal Size for the crop and position that land closest. Untick a crop direction to keep that axis uncropped; Size is then set by that axis alone.</p>
+  <div class=&quot;row&quot;>
+    <div><label>Target left (px)</label><input id=&quot;cl&quot; type=&quot;number&quot; value=&quot;1300&quot;></div>
+    <div><label>Target top (px)</label><input id=&quot;ct&quot; type=&quot;number&quot; value=&quot;100&quot;></div>
+  </div>
+  <div class=&quot;row&quot;>
+    <div><label>Target width (px)</label><input id=&quot;cw&quot; type=&quot;number&quot; value=&quot;500&quot;></div>
+    <div><label>Target height (px)</label><input id=&quot;ch&quot; type=&quot;number&quot; value=&quot;500&quot;></div>
+  </div>
+  <div class=&quot;row&quot;>
+    <div><label>Keep from source (horizontal)</label>
+      <select id=&quot;cah&quot;><option value=&quot;c&quot;>Centre</option><option value=&quot;l&quot;>Left side</option><option value=&quot;r&quot;>Right side</option></select>
+    </div>
+    <div><label>Keep from source (vertical)</label>
+      <select id=&quot;cav&quot;><option value=&quot;c&quot;>Centre</option><option value=&quot;t&quot;>Top</option><option value=&quot;b&quot;>Bottom</option></select>
+    </div>
+  </div>
+  <label>Allow cropping</label>
+  <div style=&quot;display:flex;gap:20px;margin-bottom:4px&quot;>
+    <label style=&quot;display:flex;gap:6px;align-items:center;color:var(--ink);font-size:13px&quot;>
+      <input id=&quot;ccx&quot; type=&quot;checkbox&quot; checked style=&quot;width:auto&quot;> Horizontal (left / right)
+    </label>
+    <label style=&quot;display:flex;gap:6px;align-items:center;color:var(--ink);font-size:13px&quot;>
+      <input id=&quot;ccy&quot; type=&quot;checkbox&quot; checked style=&quot;width:auto&quot;> Vertical (top / bottom)
+    </label>
+  </div>
+  <label>Position X/Y refers to</label>
+  <select id=&quot;cmode&quot;>
+    <option value=&quot;full&quot;>Uncropped box centre (picture stays put when cropping)</option>
+    <option value=&quot;crop&quot;>Centre of the cropped box</option>
+  </select>
+  <div style=&quot;margin-top:12px&quot;>
+    <div class=&quot;out&quot;><span>Position X / Y</span><b id=&quot;cpx&quot;></b></div>
+    <div class=&quot;out&quot;><span>Size</span><b id=&quot;cps&quot;></b></div>
+    <div class=&quot;out&quot;><span>Crop Top / Bottom</span><b id=&quot;cpv&quot;></b></div>
+    <div class=&quot;out&quot;><span>Crop Left / Right</span><b id=&quot;cph&quot;></b></div>
+    <div class=&quot;out&quot;><span>Achieved box</span><span id=&quot;cpa&quot;></span></div>
+    <div class=&quot;out&quot;><span>Max edge error</span><b id=&quot;cpe&quot;></b></div>
+  </div>
+  <div id=&quot;cwarn&quot; class=&quot;warn-text&quot;></div>
+  <canvas id=&quot;cv2&quot; width=&quot;960&quot; height=&quot;540&quot;></canvas>
+  <small>Crop values are in frame units (Top/Bottom 0–18, Left/Right 0–32) and are applied to the source before it is scaled by Size. The &quot;refers to&quot; setting depends on how your ATEM anchors a cropped box: enter the result once and check the box lands on the target. If it is shifted, switch this setting.</small>
+</div>
+
+<div class=&quot;card&quot;>
+  <h2>Full layout (up to 4 boxes)</h2>
+  <p style=&quot;font-size:13px;color:var(--mute);margin-bottom:12px&quot;>Place each box by the exact pixel rectangle you want it to fill. Each gets its own ATEM values, and all boxes appear together in the preview.</p>
+  <label>Position X/Y refers to</label>
+  <select id=&quot;lmode&quot;>
+    <option value=&quot;full&quot;>Uncropped box centre (picture stays put when cropping)</option>
+    <option value=&quot;crop&quot;>Centre of the cropped box</option>
+  </select>
+  <div id=&quot;bx&quot; style=&quot;margin-top:12px&quot;></div>
+  <button id=&quot;addbox&quot; class=&quot;ghost&quot;>+ Add box</button>
+  <button id=&quot;copyall&quot;>Copy all values</button>
+  <canvas id=&quot;cv3&quot; width=&quot;960&quot; height=&quot;540&quot;></canvas>
+  <small>Solid = what the ATEM will produce after rounding. Dashed = your target. Higher box numbers draw on top.</small>
+</div>
+
+<div class=&quot;card&quot;>
+  <h2>Preview (from pixel inputs)</h2>
+  <canvas id=&quot;cv&quot; width=&quot;960&quot; height=&quot;540&quot;></canvas>
+  <small>Assumes the source fills the box uncropped and the source is the same resolution as the output. Limits used: X ±48, Y ±27, size 0.07–1.00, both entered to 2 decimal places (editable in the L object in the script). Crop is not included.</small>
+</div>
+
+</main>
+<script>
+const $=id=>document.getElementById(id), r2=n=>Math.round(n*100)/100, f=n=>r2(n).toFixed(2);
+const L={xMin:-48,xMax:48,yMin:-27,yMax:27,sMin:0.07,sMax:1,posStep:0.01,sizeStep:0.01};
+const snap=(v,st)=>Math.round(v/st)*st, clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+const fix=(v,st)=>+v.toFixed(Math.max(0,Math.round(-Math.log10(st))));
+function dims(){return{W:+$('W').value||1920,H:+$('H').value||1080}}
+function calc(){
+  const {W,H}=dims(), ppu=W/32; $('ppu').textContent=r2(ppu);
+  const l=+$('pl').value, t=+$('pt').value, w=+$('pw').value, ph=+$('ph').value||w*9/16;
+  const needCrop=Math.abs(ph-w*9/16)>0.5, h=needCrop?ph:w*9/16;
+  const cx=l+w/2, cy=t+h/2;
+  let x,y,s,warn=[],cr=[0,0,0,0];
+  if(needCrop){
+    const b=fitCrop(l,t,w,ph,$('cah').value,$('cav').value,$('cmode').value==='full',!$('ccx').checked,!$('ccy').checked);
+    if(!b){x=y=0;s=0;$('oa').textContent='–';$('oe').textContent='–';warn.push(`A ${r2(w)} × ${r2(ph)} px box is bigger than the ${W} × ${H} frame.`);}
+    else{
+      x=b.X;y=b.Y;s=b.sz;cr=[b.cT,b.cB,b.cL,b.cR];
+      $('oa').textContent=`left ${r2(b.r.l)}, top ${r2(b.r.t)}, ${r2(b.r.r-b.r.l)} × ${r2(b.r.b-b.r.t)}`;
+      $('oe').textContent=r2(b.err)+' px';$('oe').style.color=b.err>1?'#ff6b6b':'';
+      if(b.err>1)warn.push(`Closest legal match is ${r2(b.err)} px off; ATEM steps limit how exact this can be.`);
+    }
+    $('oh').textContent=r2(ph)+' px (cropped)';
+  }else{
+    const rx=(cx-W/2)/ppu, ry=-(cy-H/2)/ppu, rs=w/W;
+    x=fix(clamp(snap(rx,L.posStep),L.xMin,L.xMax),L.posStep);
+    y=fix(clamp(snap(ry,L.posStep),L.yMin,L.yMax),L.posStep);
+    s=fix(clamp(snap(rs,L.sizeStep),L.sMin,L.sMax),L.sizeStep);
+    if(x!==fix(snap(rx,L.posStep),L.posStep))warn.push(`X ${f(rx)} is outside ${L.xMin} to ${L.xMax}; clamped.`);
+    if(y!==fix(snap(ry,L.posStep),L.posStep))warn.push(`Y ${f(ry)} is outside ${L.yMin} to ${L.yMax}; clamped.`);
+    if(s!==fix(snap(rs,L.sizeStep),L.sizeStep))warn.push(`Size ${f(rs)} is outside ${f(L.sMin)} to ${f(L.sMax)}; clamped.`);
+    const aw=s*W, ah=aw*9/16, acx=W/2+x*ppu, acy=H/2-y*ppu;
+    $('oh').textContent=r2(ah)+' px (16:9, no crop)';
+    const al=acx-aw/2, at=acy-ah/2;
+    $('oa').textContent=`left ${r2(al)}, top ${r2(at)}, w ${r2(aw)}`;
+    const err=Math.max(Math.abs(al-l),Math.abs(at-t),Math.abs(aw-w));
+    $('oe').textContent=r2(err)+' px'; $('oe').style.color=err>1?'#ff6b6b':'';
+    if(err>0.5&amp;&amp;!warn.length)warn.push(`Steps are ${r2(L.posStep*ppu)} px (position) and ${r2(L.sizeStep*W)} px (width), so this is the closest value the ATEM can hold.`);
+  }
+  $('ox').textContent=f(x); $('oy').textContent=f(y); $('os').textContent=f(s);
+  $('ocv').textContent=f(cr[0])+' / '+f(cr[1]); $('och').textContent=f(cr[2])+' / '+f(cr[3]);
+  $('warn').innerHTML=warn.map(m=>'⚠ '+m).join('<br>');
+  window._copy=`X ${f(x)}  Y ${f(y)}  Size ${f(s)}  Crop T ${f(cr[0])} B ${f(cr[1])} L ${f(cr[2])} R ${f(cr[3])}`;
+  const X2=clamp(snap(+$('ax').value,L.posStep),L.xMin,L.xMax), Y2=clamp(snap(+$('ay').value,L.posStep),L.yMin,L.yMax), S=clamp(snap(+$('as').value,L.sizeStep),L.sMin,L.sMax);
+  const bw=S*W, bh=bw*9/16, px=W/2+X2*ppu, py=H/2-Y2*ppu;
+  $('rc').textContent=`${r2(px)}, ${r2(py)}`;
+  $('rt').textContent=`${r2(px-bw/2)}, ${r2(py-bh/2)}`;
+  $('rb').textContent=`${r2(px+bw/2)}, ${r2(py+bh/2)}`;
+  $('rs').textContent=`${r2(bw)} × ${r2(bh)} px`;
+  const cv=$('cv'), g=cv.getContext('2d'); cv.height=cv.width*H/W; const k=cv.width/W;
+  g.clearRect(0,0,cv.width,cv.height); g.fillStyle='#111'; g.fillRect(0,0,cv.width,cv.height);
+  g.strokeStyle='#333'; g.lineWidth=1; g.beginPath();
+  g.moveTo(cv.width/2,0);g.lineTo(cv.width/2,cv.height);g.moveTo(0,cv.height/2);g.lineTo(cv.width,cv.height/2);g.stroke();
+  g.fillStyle='rgba(255,51,51,.35)'; g.fillRect(l*k,t*k,w*k,h*k);
+  g.strokeStyle='#ff3333'; g.lineWidth=2; g.strokeRect(l*k,t*k,w*k,h*k);
+  g.fillStyle='#fff'; g.font=&quot;13px 'JetBrains Mono',monospace&quot;; g.fillText(`X ${f(x)}  Y ${f(y)}  ${f(s)}`,l*k+8,t*k+20);
+}
+$('preset').onchange=e=>{ if(e.target.value!=='custom'){const[a,b]=e.target.value.split('x');$('W').value=a;$('H').value=b;} calc() };
+['W','H'].forEach(i=>$(i).addEventListener('input',()=>{$('preset').value='custom';calc()}));
+['pl','pt','pw','ax','ay','as'].forEach(i=>$(i).addEventListener('input',calc));
+$('copy').onclick=()=>{try{navigator.clipboard.writeText(window._copy);$('copy').textContent='Copied'}catch(e){$('copy').textContent=window._copy}setTimeout(()=>$('copy').textContent='Copy values',1500)};
+calc();
+
+function fitCrop(tl,tt,tw,th,ah,av,full,noH,noV){
+  const {W,H}=dims(), ppu=W/32;
+  const tcx=tl+tw/2, tcy=tt+th/2; let best=null;
+  const i0=Math.round(L.sMin/L.sizeStep), i1=Math.round(L.sMax/L.sizeStep);
+  for(let i=i0;i<=i1;i++){
+    const sz=fix(i*L.sizeStep,L.sizeStep), k=sz*ppu, hu=tw/k, vu=th/k;
+    if((!noH&amp;&amp;hu>32+1e-9)||(!noV&amp;&amp;vu>18+1e-9))continue;
+    const th_=32-hu, tv=18-vu;
+    let cL=ah==='l'?0:ah==='r'?th_:th_/2, cT=av==='t'?0:av==='b'?tv:tv/2;
+    let cR=th_-cL, cB=tv-cT;
+    const sn=(v,mx)=>fix(clamp(snap(v,L.posStep),0,mx),L.posStep);
+    cL=sn(cL,32);cR=sn(cR,32);cT=sn(cT,18);cB=sn(cB,18);
+    if(noH){cL=0;cR=0}if(noV){cT=0;cB=0}
+    const vw=(32-cL-cR)*k, vh=(18-cT-cB)*k, dx=full?(cL-cR)/2*k:0, dy=full?(cT-cB)/2*k:0;
+    const X=fix(clamp(snap((tcx-dx-W/2)/ppu,L.posStep),L.xMin,L.xMax),L.posStep);
+    const Y=fix(clamp(snap(-(tcy-dy-H/2)/ppu,L.posStep),L.yMin,L.yMax),L.posStep);
+    const vcx=W/2+X*ppu+dx, vcy=H/2-Y*ppu+dy;
+    const r={l:vcx-vw/2,t:vcy-vh/2,r:vcx+vw/2,b:vcy+vh/2};
+    const err=Math.max(Math.abs(r.l-tl),Math.abs(r.t-tt),Math.abs(r.r-tl-tw),Math.abs(r.b-tt-th));
+    if(!best||err<best.err-1e-9)best={sz,X,Y,cL,cR,cT,cB,r,err};
+  }
+  return best;
+}
+function calcCrop(){
+  const {W,H}=dims(), g=id=>+$(id).value;
+  const tl=g('cl'),tt=g('ct'),tw=g('cw'),th=g('ch');
+  const best=fitCrop(tl,tt,tw,th,$('cah').value,$('cav').value,$('cmode').value==='full',!$('ccx').checked,!$('ccy').checked);
+  const cv=$('cv2'),x=cv.getContext('2d'); cv.height=cv.width*H/W; const k=cv.width/W;
+  x.fillStyle='#111';x.fillRect(0,0,cv.width,cv.height);
+  x.strokeStyle='#4aa3ff';x.setLineDash([6,4]);x.lineWidth=2;x.strokeRect(tl*k,tt*k,tw*k,th*k);x.setLineDash([]);
+  if(!best){['cpx','cps','cpv','cph','cpa','cpe'].forEach(i=>$(i).textContent='–');
+    $('cwarn').textContent='⚠ That rectangle is bigger than the frame can show (max '+W+' × '+H+' px).';return}
+  $('cwarn').textContent=best.err>1?'⚠ Closest legal match is '+r2(best.err)+' px off; ATEM steps limit how exact this can be.':'';
+  $('cpx').textContent=f(best.X)+' / '+f(best.Y); $('cps').textContent=f(best.sz);
+  $('cpv').textContent=f(best.cT)+' / '+f(best.cB); $('cph').textContent=f(best.cL)+' / '+f(best.cR);
+  const r=best.r; $('cpa').textContent=`left ${r2(r.l)}, top ${r2(r.t)}, ${r2(r.r-r.l)} × ${r2(r.b-r.t)}`;
+  $('cpe').textContent=r2(best.err)+' px'; $('cpe').style.color=best.err>1?'#ff6b6b':'';
+  x.fillStyle='rgba(255,51,51,.35)';x.fillRect(r.l*k,r.t*k,(r.r-r.l)*k,(r.b-r.t)*k);
+  x.strokeStyle='#ff3333';x.lineWidth=2;x.strokeRect(r.l*k,r.t*k,(r.r-r.l)*k,(r.b-r.t)*k);
+}
+['cl','ct','cw','ch','cah','cav','cmode','W','H','preset','ccx','ccy'].forEach(i=>{$(i).addEventListener('input',calcCrop);$(i).addEventListener('change',calcCrop)});
+$('preset').addEventListener('change',calcCrop);
+let manualH=false;
+$('ph').addEventListener('input',()=>{manualH=true;calc()});
+$('pw').addEventListener('input',()=>{if(!manualH){$('ph').value=Math.round(+$('pw').value*9/16*100)/100;calc()}});
+$('r169').onclick=()=>{manualH=false;$('ph').value=Math.round(+$('pw').value*9/16*100)/100;calc()};
+['cah','cav','cmode','ccx','ccy'].forEach(i=>{$(i).addEventListener('input',calc);$(i).addEventListener('change',calc)});
+calcCrop();
+
+const COLS=['#ff3333','#4a9fff','#2db36b','#b45fe0'];
+let boxes=[{l:0,t:0,w:960,h:540,ah:'c',av:'c'},{l:1000,t:100,w:500,h:500,ah:'c',av:'c'}];
+const sel=(i,k,v,o)=>`<select data-i=&quot;${i}&quot; data-k=&quot;${k}&quot;>`+o.map(([a,b])=>`<option value=&quot;${a}&quot;${a===v?' selected':''}>${b}</option>`).join('')+'</select>';
+function buildBoxes(){
+  $('bx').innerHTML=boxes.map((b,i)=>`<div style=&quot;border-left:3px solid ${COLS[i]};padding:8px 12px;margin-bottom:12px;background:var(--bg);border-radius:6px&quot;>
+  <div style=&quot;display:flex;justify-content:space-between;margin-bottom:8px&quot;><b style=&quot;font-family:var(--font-mono);font-size:13px&quot;>Box ${i+1}</b>${boxes.length>1?`<span class=&quot;rm&quot; data-i=&quot;${i}&quot; style=&quot;cursor:pointer;color:var(--mute);font-size:12px&quot;>Remove</span>`:''}</div>
+  <div class=&quot;r4&quot;>${[['l','Left'],['t','Top'],['w','Width'],['h','Height']].map(([k,n])=>`<div><label>${n} (px)</label><input type=&quot;number&quot; data-i=&quot;${i}&quot; data-k=&quot;${k}&quot; value=&quot;${b[k]}&quot;></div>`).join('')}</div>
+  <div class=&quot;row&quot;><div><label>Keep from source (H)</label>${sel(i,'ah',b.ah,[['c','Centre'],['l','Left side'],['r','Right side']])}</div>
+  <div><label>Keep from source (V)</label>${sel(i,'av',b.av,[['c','Centre'],['t','Top'],['b','Bottom']])}</div></div>
+  <div id=&quot;br${i}&quot; style=&quot;margin-top:8px;font-variant-numeric:tabular-nums&quot;></div></div>`).join('');
+  $('addbox').style.display=boxes.length>=4?'none':'';
+  calcLayout();
+}
+function calcLayout(){
+  const {W,H}=dims(), full=$('lmode').value==='full', out=[];
+  const cv=$('cv3'),x=cv.getContext('2d'); cv.height=cv.width*H/W; const k=cv.width/W;
+  x.fillStyle='#111';x.fillRect(0,0,cv.width,cv.height);
+  x.strokeStyle='#333';x.lineWidth=1;x.beginPath();x.moveTo(cv.width/2,0);x.lineTo(cv.width/2,cv.height);x.moveTo(0,cv.height/2);x.lineTo(cv.width,cv.height/2);x.stroke();
+  boxes.forEach((b,i)=>{
+    const r=fitCrop(b.l,b.t,b.w,b.h,b.ah,b.av,full), el=$('br'+i); if(!el)return;
+    x.strokeStyle=COLS[i];x.lineWidth=1.5;x.setLineDash([6,4]);x.strokeRect(b.l*k,b.t*k,b.w*k,b.h*k);x.setLineDash([]);
+    if(!r){el.innerHTML='<span style=&quot;color:#ff6b6b&quot;>⚠ Bigger than the '+W+' × '+H+' frame.</span>';return}
+    const q=r.r; x.globalAlpha=.35;x.fillStyle=COLS[i];x.fillRect(q.l*k,q.t*k,(q.r-q.l)*k,(q.b-q.t)*k);x.globalAlpha=1;
+    x.strokeStyle=COLS[i];x.lineWidth=2;x.strokeRect(q.l*k,q.t*k,(q.r-q.l)*k,(q.b-q.t)*k);
+    x.fillStyle='#fff';x.font=&quot;bold 16px 'JetBrains Mono',monospace&quot;;x.fillText(i+1,q.l*k+8,q.t*k+22);
+    const line=`X ${f(r.X)}  Y ${f(r.Y)}  Size ${f(r.sz)}  Crop T ${f(r.cT)} B ${f(r.cB)} L ${f(r.cL)} R ${f(r.cR)}`;
+    out.push(`Box ${i+1}: ${line}`);
+    el.innerHTML=`<div class=&quot;out&quot;><span>Position X / Y</span><b>${f(r.X)} / ${f(r.Y)}</b></div><div class=&quot;out&quot;><span>Size</span><b>${f(r.sz)}</b></div><div class=&quot;out&quot;><span>Crop Top / Bottom</span><b>${f(r.cT)} / ${f(r.cB)}</b></div><div class=&quot;out&quot;><span>Crop Left / Right</span><b>${f(r.cL)} / ${f(r.cR)}</b></div><div class=&quot;out&quot;><span>Max edge error</span><b${r.err>1?' style=&quot;color:#ff6b6b&quot;':''}>${r2(r.err)} px</b></div>`;
+  });
+  window._all=out.join('\n');
+}
+$('bx').addEventListener('input',e=>{const d=e.target.dataset;if(d.k===undefined)return;boxes[d.i][d.k]=['ah','av'].includes(d.k)?e.target.value:+e.target.value;calcLayout()});
+$('bx').addEventListener('click',e=>{if(e.target.classList.contains('rm')){boxes.splice(+e.target.dataset.i,1);buildBoxes()}});
+$('addbox').onclick=()=>{if(boxes.length<4){boxes.push({l:0,t:0,w:480,h:270,ah:'c',av:'c'});buildBoxes()}};
+$('copyall').onclick=()=>{try{navigator.clipboard.writeText(window._all);$('copyall').textContent='Copied'}catch(e){$('copyall').textContent='Copy failed'}setTimeout(()=>$('copyall').textContent='Copy all values',1500)};
+['W','H','preset','lmode'].forEach(i=>{$(i).addEventListener('input',calcLayout);$(i).addEventListener('change',calcLayout)});
+buildBoxes();
+</script>
+</body>
+</html>" title="ATEM SuperSource Pixel Calculator"></iframe></div>
 </body>
 </html>
